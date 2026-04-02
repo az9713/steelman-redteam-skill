@@ -1,0 +1,34 @@
+{
+  "expectations": [
+    {
+      "text": "has-four-sections: The response has clearly structured steelman of the claim, red-team of that steelman, steelman of the counter-claim, red-team of the counter-claim, and synthesis — all five sections present",
+      "passed": false,
+      "evidence": "The response has only three sections: 'Part 1: The Steelman — The Best Case FOR This Change', 'Part 2: The Red Team — The Strongest Case AGAINST This Change', and 'Part 3: The Synthesis — What Both Sides Get Right'. The required five-section structure (steelman of claim, red-team of that steelman, steelman of counter-claim, red-team of counter-claim, synthesis) is not present. There is no distinct steelman of the counter-claim and no red-team of the counter-claim as separate sections. Part 2 is labeled a red team but it argues against the original proposition rather than red-teaming the steelman of the counter-claim."
+    },
+    {
+      "text": "steelmans-are-genuinely-strong: Both steelman sections represent the strongest reasonable case for their position — someone who holds that view would recognize it as a fair and compelling presentation, not a weakened version",
+      "passed": false,
+      "evidence": "The response contains only one steelman section (Part 1, for eliminating annual reviews). It is genuinely strong, citing recency bias research, the Adobe case study saving '$80M+ annually', Deloitte/Accenture/GE/Microsoft adoption, and psychological safety research. However, there is no steelman for the counter-claim (keeping structured periodic reviews). Part 2 is framed as a red team, not a steelman. Since 'both steelman sections' cannot exist when only one steelman is present, this assertion fails."
+    },
+    {
+      "text": "synthesis-gives-actionable-conclusion: The synthesis gives a conclusion that would be genuinely useful to a business leader deciding on performance review policy — either a clear recommendation, a clear identification of when each approach is better, or a precise naming of the values/empirical question that drives the disagreement",
+      "passed": true,
+      "evidence": "The synthesis states: 'The most defensible position is a hybrid: eliminate annual ratings and forced distributions, but retain semi-annual or annual structured touchpoints that document development, enable cross-calibration, support legal compliance, and integrate with compensation. Layer continuous feedback on top of — not instead of — that structural foundation. The proposition as stated (\"replace with continuous feedback only\") overclaims. The word \"only\" is where it breaks down.' This gives a business leader a clear, specific recommendation with enumerated justifications."
+    }
+  ],
+  "summary": {
+    "passed": 1,
+    "failed": 2,
+    "total": 3,
+    "pass_rate": 0.33
+  },
+  "claims": [],
+  "eval_feedback": {
+    "suggestions": [
+      "The prompt requires a five-section structure but the response only produces three sections. The skill or prompt should enforce: (1) steelman of the original claim, (2) red-team of that steelman, (3) steelman of the counter-claim, (4) red-team of the counter-claim, (5) synthesis.",
+      "A steelman of the counter-claim (i.e., the best case FOR keeping structured annual reviews) is entirely absent. The 'red team' section argues against the proposition but does not present the strongest affirmative case for annual reviews as a standalone steelman.",
+      "The synthesis is the strongest section and would genuinely help a business leader. If the structural issues were fixed, the overall response quality appears high."
+    ],
+    "overall": "The response produces strong analytical content but fails the structural requirement of five distinct sections. Only one steelman is present (for eliminating annual reviews); the steelman of the counter-claim is missing entirely. The synthesis is clear and actionable. Overall pass rate is 1/3 (33%)."
+  }
+}

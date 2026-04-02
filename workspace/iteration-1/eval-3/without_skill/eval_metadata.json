@@ -1,0 +1,6 @@
+{
+  "eval_id": 3,
+  "eval_name": "eliminate-annual-performance-reviews",
+  "prompt": "I want you to steelman and red team this: companies should eliminate annual performance reviews and replace them with continuous feedback only",
+  "assertions": []
+}

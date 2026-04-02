@@ -1,0 +1,43 @@
+{
+  "expectations": [
+    {
+      "text": "has-four-sections: Output has all four argument sections (steelman of claim, red-team of steelman, steelman of counter-claim, red-team of counter-claim's steelman) plus a synthesis section",
+      "passed": true,
+      "evidence": "All five sections are present with clear headings: '## Steelman: Raising the federal minimum wage to $25/hour would be net positive for low-income workers', '## Red Team: Against the Steelman', '## Steelman: A $25 federal minimum wage would be net negative for low-income workers', '## Red Team: Against the Counter-Claim\u2019s Steelman', and '## Synthesis'."
+    },
+    {
+      "text": "steelmans-cite-evidence: Both steelman sections contain specific empirical evidence, economic reasoning, or concrete examples \u2014 not just vague assertions",
+      "passed": true,
+      "evidence": "Steelman 1 cites: 'The federal minimum wage of $7.25/hour has lost roughly 40% of its real value since 1968', 'The Seattle Minimum Wage Study (Dube et al.)', 'California and New York City have implemented wages well above $15 with no observable employment catastrophe', and '33 million workers'. Steelman 2 (counter-claim) cites specific regional examples ('rural Mississippi or West Virginia', 'rural Alabama'), specific worker categories (young, criminal records, limited English), EITC empirical track record, and the fiscal mechanics of transfer programs."
+    },
+    {
+      "text": "red-teams-find-real-weaknesses: Both red-team sections attack the steelmanned version of each argument (not a weaker version), and identify vulnerabilities that a thoughtful proponent would find genuinely challenging",
+      "passed": true,
+      "evidence": "Red Team 1 directly attacks the steelman's core empirical claims: 'The empirical record supporting minimum wage increases is drawn almost entirely from studies of increases to $10, $12, or $15 \u2014 not $25' and 'fast food and retail operate on 2-5% net margins. Where is the monopsony rent?' \u2014 directly undermining the monopsony argument. Red Team 2 attacks the counter-claim's geographic argument ('proves too much \u2014 it proves that there should be no federal minimum wage'), the productivity-floor argument ('treats productivity as a fixed characteristic'), and the EITC alternative ('The EITC can function as a subsidy to low-wage employers')."
+    },
+    {
+      "text": "synthesis-gives-verdict: The synthesis section provides a specific conclusion, verdict, or clearly names the unresolved empirical question or value disagreement at the heart of the debate \u2014 not just 'it depends' without explanation",
+      "passed": true,
+      "evidence": "'The claim as stated \u2014 that a $25 federal minimum wage would be net positive for low-income workers \u2014 is probably false, and the falseness is not close-call. The key failure is the \u201cfederal\u201d framing combined with the $25 number.' The synthesis also names the unresolved empirical question: 'does the labor market evidence from moderate increases ($10\u2013$15) extend to a $25 federal floor?'"
+    },
+    {
+      "text": "synthesis-explains-reasoning-chain: The synthesis explains how the four preceding arguments (what survived, what was damaged, what converged or contradicted) led to its conclusion",
+      "passed": true,
+      "evidence": "The synthesis contains explicit subsections 'What survived red-teaming', 'What converges', 'What genuinely contradicts', and 'The reasoning chain' with four numbered points tracing each section's contribution: '1. The steelman is strong on the mechanism...It weakens significantly on the $25 threshold specifically and on geographic heterogeneity. 2. The red team on the steelman lands hardest on magnitude extrapolation... 3. The counter-claim steelman is strongest on the geographic mismatch... 4. The red team on the counter-claim partially rehabilitates the steelman...But it does not overcome the geographic heterogeneity problem.'"
+    }
+  ],
+  "summary": {
+    "passed": 5,
+    "failed": 0,
+    "total": 5,
+    "pass_rate": 1.0
+  },
+  "claims": [],
+  "eval_feedback": {
+    "suggestions": [
+      "The second steelman (counter-claim) relies more on economic reasoning and examples than on named empirical studies; adding a citation like Card & Krueger or a specific EITC study would strengthen it.",
+      "The red team on the counter-claim briefly mentions Scandinavia/Germany high-minimum-wage regimes but does not cite specific studies; a named reference would increase evidentiary weight."
+    ],
+    "overall": "An exceptionally strong response. All five required sections are present and clearly delineated. Both steelmans are substantive and evidence-grounded. Both red teams attack the steelmanned arguments at their strongest points rather than strawmanning. The synthesis provides a clear, well-reasoned verdict ('probably false, and the falseness is not close-call') rather than a non-committal 'it depends', and it explicitly traces how each of the four preceding sections contributed to that conclusion. This is a high-quality example of the steelman-redteam format."
+  }
+}

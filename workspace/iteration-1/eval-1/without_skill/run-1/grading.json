@@ -1,0 +1,45 @@
+{
+  "expectations": [
+    {
+      "text": "has-four-sections: Output has all four argument sections (steelman of claim, red-team of steelman, steelman of counter-claim, red-team of counter-claim's steelman) plus a synthesis section",
+      "passed": false,
+      "evidence": "The output contains only two argument sections — 'STEELMAN: The Strongest Case FOR' and 'RED TEAM: The Strongest Case AGAINST' — followed by a 'Summary'. There is no 'steelman of counter-claim' (the strongest case against raising the minimum wage to $25) and no 'red-team of counter-claim's steelman'. The required four-section dialectical structure is absent; the output follows a conventional two-sided debate format instead."
+    },
+    {
+      "text": "steelmans-cite-evidence: Both steelman sections contain specific empirical evidence, economic reasoning, or concrete examples — not just vague assertions",
+      "passed": false,
+      "evidence": "Only one steelman section exists. That section is evidence-rich — it cites the CBO 2021 analysis, economists Dube/Reich/Zipperer, Seattle/San Francisco/New York city-level examples, monopsony literature, and SNAP/Medicaid spending estimates. However, because there is no steelman of the counter-claim, the assertion that 'both steelman sections' contain empirical evidence cannot be satisfied. The single steelman section would pass on its own merits."
+    },
+    {
+      "text": "red-teams-find-real-weaknesses: Both red-team sections attack the steelmanned version of each argument (not a weaker version), and identify vulnerabilities that a thoughtful proponent would find genuinely challenging",
+      "passed": false,
+      "evidence": "Only one red-team section exists. That section does engage seriously with the steelmanned arguments — for example, 'The Empirical Literature Does Not Clearly Generalize to $25' directly challenges the Dube/Reich/Zipperer evidence cited in the steelman, and the automation and regional variation points are genuinely challenging. However, because there is no steelman of counter-claim and therefore no red-team of counter-claim's steelman, the assertion that 'both red-team sections' attack steelmanned arguments cannot be satisfied."
+    },
+    {
+      "text": "synthesis-gives-verdict: The synthesis section provides a specific conclusion, verdict, or clearly names the unresolved empirical question or value disagreement at the heart of the debate — not just 'it depends' without explanation",
+      "passed": true,
+      "evidence": "The Summary provides a specific, calibrated verdict: 'a $15–$18 federal minimum with regional adjustment mechanisms has a reasonably strong evidence base behind it. A flat $25 national minimum involves substantially more uncertainty, and the risk that it harms the specific low-income workers it is designed to help is non-trivial rather than dismissible.' This names a concrete threshold and distinguishes evidentially supported from evidentially unsupported policy levels."
+    },
+    {
+      "text": "synthesis-explains-reasoning-chain: The synthesis explains how the four preceding arguments (what survived, what was damaged, what converged or contradicted) led to its conclusion",
+      "passed": false,
+      "evidence": "The Summary references the steelman and red-team cases ('The steelman case is genuinely strong... The red team case is also genuinely strong') but there are only two preceding argument sections, not four. The synthesis cannot trace a reasoning chain through four arguments that do not exist. The summary is a reasonable synthesis of the two-section structure actually present, but it does not — and cannot — explain how four arguments converged or contradicted to produce its conclusion."
+    }
+  ],
+  "summary": {
+    "passed": 1,
+    "failed": 4,
+    "total": 5,
+    "pass_rate": 0.2
+  },
+  "claims": [],
+  "eval_feedback": {
+    "suggestions": [
+      "The output is missing the core structural requirement: a four-section dialectical format. It should add (3) a steelman of the counter-claim (the strongest case that $25 would NOT be net positive) and (4) a red-team of that steelman.",
+      "The existing steelman FOR and red-team AGAINST sections are high quality — well-evidenced and substantive — so the content approach is sound; only the structure needs to be extended.",
+      "The synthesis verdict is specific and useful, but it should explicitly trace how all four argument sections (including the two missing ones) informed the conclusion.",
+      "Consider making the section headers explicitly label what each section is doing (e.g., 'Steelman of the Claim', 'Red-Team of the Steelman', 'Steelman of the Counter-Claim', 'Red-Team of the Counter-Claim's Steelman') so the dialectical structure is immediately legible."
+    ],
+    "overall": "The output produces a high-quality two-sided debate with strong empirical grounding and a specific verdict, but it fails to implement the required four-section dialectical structure. Only 1 of 5 assertions pass. The core deficit is structural: two of the four required argument sections are entirely absent (steelman of counter-claim and red-team of counter-claim's steelman), which cascades into failures on the multi-steelman, multi-red-team, and reasoning-chain assertions."
+  }
+}

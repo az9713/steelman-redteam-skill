@@ -1,0 +1,1325 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Eval Review</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600&family=Lora:wght@400;500&display=swap" rel="stylesheet">
+  <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js" integrity="sha384-EnyY0/GSHQGSxSgMwaIPzSESbqoOLSexfnSMN2AP+39Ckmn92stwABZynq1JyzdT" crossorigin="anonymous"></script>
+  <style>
+    :root {
+      --bg: #faf9f5;
+      --surface: #ffffff;
+      --border: #e8e6dc;
+      --text: #141413;
+      --text-muted: #b0aea5;
+      --accent: #d97757;
+      --accent-hover: #c4613f;
+      --green: #788c5d;
+      --green-bg: #eef2e8;
+      --red: #c44;
+      --red-bg: #fceaea;
+      --header-bg: #141413;
+      --header-text: #faf9f5;
+      --radius: 6px;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Lora', Georgia, serif;
+      background: var(--bg);
+      color: var(--text);
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ---- Header ---- */
+    .header {
+      background: var(--header-bg);
+      color: var(--header-text);
+      padding: 1rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-shrink: 0;
+    }
+    .header h1 {
+      font-family: 'Poppins', sans-serif;
+      font-size: 1.25rem;
+      font-weight: 600;
+    }
+    .header .instructions {
+      font-size: 0.8rem;
+      opacity: 0.7;
+      margin-top: 0.25rem;
+    }
+    .header .progress {
+      font-size: 0.875rem;
+      opacity: 0.8;
+      text-align: right;
+    }
+
+    /* ---- Main content ---- */
+    .main {
+      flex: 1;
+      overflow-y: auto;
+      padding: 1.5rem 2rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1.25rem;
+    }
+
+    /* ---- Sections ---- */
+    .section {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      flex-shrink: 0;
+    }
+    .section-header {
+      font-family: 'Poppins', sans-serif;
+      padding: 0.75rem 1rem;
+      font-size: 0.75rem;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-muted);
+      border-bottom: 1px solid var(--border);
+      background: var(--bg);
+    }
+    .section-body {
+      padding: 1rem;
+    }
+
+    /* ---- Config badge ---- */
+    .config-badge {
+      display: inline-block;
+      padding: 0.2rem 0.625rem;
+      border-radius: 9999px;
+      font-family: 'Poppins', sans-serif;
+      font-size: 0.6875rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+      margin-left: 0.75rem;
+      vertical-align: middle;
+    }
+    .config-badge.config-primary {
+      background: rgba(33, 150, 243, 0.12);
+      color: #1976d2;
+    }
+    .config-badge.config-baseline {
+      background: rgba(255, 193, 7, 0.15);
+      color: #f57f17;
+    }
+
+    /* ---- Prompt ---- */
+    .prompt-text {
+      white-space: pre-wrap;
+      font-size: 0.9375rem;
+      line-height: 1.6;
+    }
+
+    /* ---- Outputs ---- */
+    .output-file {
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+    }
+    .output-file + .output-file {
+      margin-top: 1rem;
+    }
+    .output-file-header {
+      padding: 0.5rem 0.75rem;
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      background: var(--bg);
+      border-bottom: 1px solid var(--border);
+      font-family: 'SF Mono', SFMono-Regular, Consolas, 'Liberation Mono', Menlo, monospace;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .output-file-header .dl-btn {
+      font-size: 0.7rem;
+      color: var(--accent);
+      text-decoration: none;
+      cursor: pointer;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      font-weight: 500;
+      opacity: 0.8;
+    }
+    .output-file-header .dl-btn:hover {
+      opacity: 1;
+      text-decoration: underline;
+    }
+    .output-file-content {
+      padding: 0.75rem;
+      overflow-x: auto;
+    }
+    .output-file-content pre {
+      font-size: 0.8125rem;
+      line-height: 1.5;
+      white-space: pre-wrap;
+      word-break: break-word;
+      font-family: 'SF Mono', SFMono-Regular, Consolas, 'Liberation Mono', Menlo, monospace;
+    }
+    .output-file-content img {
+      max-width: 100%;
+      height: auto;
+      border-radius: 4px;
+    }
+    .output-file-content iframe {
+      width: 100%;
+      height: 600px;
+      border: none;
+    }
+    .output-file-content table {
+      border-collapse: collapse;
+      font-size: 0.8125rem;
+      width: 100%;
+    }
+    .output-file-content table td,
+    .output-file-content table th {
+      border: 1px solid var(--border);
+      padding: 0.375rem 0.5rem;
+      text-align: left;
+    }
+    .output-file-content table th {
+      background: var(--bg);
+      font-weight: 600;
+    }
+    .output-file-content .download-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.5rem 1rem;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      color: var(--accent);
+      text-decoration: none;
+      font-size: 0.875rem;
+      cursor: pointer;
+    }
+    .output-file-content .download-link:hover {
+      background: var(--border);
+    }
+    .empty-state {
+      color: var(--text-muted);
+      font-style: italic;
+      padding: 2rem;
+      text-align: center;
+    }
+
+    /* ---- Feedback ---- */
+    .prev-feedback {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 0.625rem 0.75rem;
+      margin-top: 0.75rem;
+      font-size: 0.8125rem;
+      color: var(--text-muted);
+      line-height: 1.5;
+    }
+    .prev-feedback-label {
+      font-size: 0.7rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      margin-bottom: 0.25rem;
+      color: var(--text-muted);
+    }
+    .feedback-textarea {
+      width: 100%;
+      min-height: 100px;
+      padding: 0.75rem;
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      font-family: inherit;
+      font-size: 0.9375rem;
+      line-height: 1.5;
+      resize: vertical;
+      color: var(--text);
+    }
+    .feedback-textarea:focus {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+    }
+    .feedback-status {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      margin-top: 0.5rem;
+      min-height: 1.1em;
+    }
+
+    /* ---- Grades (collapsible) ---- */
+    .grades-toggle {
+      display: flex;
+      align-items: center;
+      cursor: pointer;
+      user-select: none;
+    }
+    .grades-toggle:hover {
+      color: var(--accent);
+    }
+    .grades-toggle .arrow {
+      margin-right: 0.5rem;
+      transition: transform 0.15s;
+      font-size: 0.75rem;
+    }
+    .grades-toggle .arrow.open {
+      transform: rotate(90deg);
+    }
+    .grades-content {
+      display: none;
+      margin-top: 0.75rem;
+    }
+    .grades-content.open {
+      display: block;
+    }
+    .grades-summary {
+      font-size: 0.875rem;
+      margin-bottom: 0.75rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .grade-badge {
+      display: inline-block;
+      padding: 0.125rem 0.5rem;
+      border-radius: 9999px;
+      font-size: 0.75rem;
+      font-weight: 600;
+    }
+    .grade-pass { background: var(--green-bg); color: var(--green); }
+    .grade-fail { background: var(--red-bg); color: var(--red); }
+    .assertion-list {
+      list-style: none;
+    }
+    .assertion-item {
+      padding: 0.625rem 0;
+      border-bottom: 1px solid var(--border);
+      font-size: 0.8125rem;
+    }
+    .assertion-item:last-child { border-bottom: none; }
+    .assertion-status {
+      font-weight: 600;
+      margin-right: 0.5rem;
+    }
+    .assertion-status.pass { color: var(--green); }
+    .assertion-status.fail { color: var(--red); }
+    .assertion-evidence {
+      color: var(--text-muted);
+      font-size: 0.75rem;
+      margin-top: 0.25rem;
+      padding-left: 1.5rem;
+    }
+
+    /* ---- View tabs ---- */
+    .view-tabs {
+      display: flex;
+      gap: 0;
+      padding: 0 2rem;
+      background: var(--bg);
+      border-bottom: 1px solid var(--border);
+      flex-shrink: 0;
+    }
+    .view-tab {
+      font-family: 'Poppins', sans-serif;
+      padding: 0.625rem 1.25rem;
+      font-size: 0.8125rem;
+      font-weight: 500;
+      cursor: pointer;
+      border: none;
+      background: none;
+      color: var(--text-muted);
+      border-bottom: 2px solid transparent;
+      transition: all 0.15s;
+    }
+    .view-tab:hover { color: var(--text); }
+    .view-tab.active {
+      color: var(--accent);
+      border-bottom-color: var(--accent);
+    }
+    .view-panel { display: none; }
+    .view-panel.active { display: flex; flex-direction: column; flex: 1; overflow: hidden; }
+
+    /* ---- Benchmark view ---- */
+    .benchmark-view {
+      padding: 1.5rem 2rem;
+      overflow-y: auto;
+      flex: 1;
+    }
+    .benchmark-table {
+      border-collapse: collapse;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      font-size: 0.8125rem;
+      width: 100%;
+      margin-bottom: 1.5rem;
+    }
+    .benchmark-table th, .benchmark-table td {
+      padding: 0.625rem 0.75rem;
+      text-align: left;
+      border: 1px solid var(--border);
+    }
+    .benchmark-table th {
+      font-family: 'Poppins', sans-serif;
+      background: var(--header-bg);
+      color: var(--header-text);
+      font-weight: 500;
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+    .benchmark-table tr:hover { background: var(--bg); }
+    .benchmark-table tr.benchmark-row-with { background: rgba(33, 150, 243, 0.06); }
+    .benchmark-table tr.benchmark-row-without { background: rgba(255, 193, 7, 0.06); }
+    .benchmark-table tr.benchmark-row-with:hover { background: rgba(33, 150, 243, 0.12); }
+    .benchmark-table tr.benchmark-row-without:hover { background: rgba(255, 193, 7, 0.12); }
+    .benchmark-table tr.benchmark-row-avg { font-weight: 600; border-top: 2px solid var(--border); }
+    .benchmark-table tr.benchmark-row-avg.benchmark-row-with { background: rgba(33, 150, 243, 0.12); }
+    .benchmark-table tr.benchmark-row-avg.benchmark-row-without { background: rgba(255, 193, 7, 0.12); }
+    .benchmark-delta-positive { color: var(--green); font-weight: 600; }
+    .benchmark-delta-negative { color: var(--red); font-weight: 600; }
+    .benchmark-notes {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1rem;
+    }
+    .benchmark-notes h3 {
+      font-family: 'Poppins', sans-serif;
+      font-size: 0.875rem;
+      margin-bottom: 0.75rem;
+    }
+    .benchmark-notes ul {
+      list-style: disc;
+      padding-left: 1.25rem;
+    }
+    .benchmark-notes li {
+      font-size: 0.8125rem;
+      line-height: 1.6;
+      margin-bottom: 0.375rem;
+    }
+    .benchmark-empty {
+      color: var(--text-muted);
+      font-style: italic;
+      text-align: center;
+      padding: 3rem;
+    }
+
+    /* ---- Navigation ---- */
+    .nav {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1rem 2rem;
+      border-top: 1px solid var(--border);
+      background: var(--surface);
+      flex-shrink: 0;
+    }
+    .nav-btn {
+      font-family: 'Poppins', sans-serif;
+      padding: 0.5rem 1.25rem;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      background: var(--surface);
+      cursor: pointer;
+      font-size: 0.875rem;
+      font-weight: 500;
+      color: var(--text);
+      transition: all 0.15s;
+    }
+    .nav-btn:hover:not(:disabled) {
+      background: var(--bg);
+      border-color: var(--text-muted);
+    }
+    .nav-btn:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+    .done-btn {
+      font-family: 'Poppins', sans-serif;
+      padding: 0.5rem 1.5rem;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      background: var(--surface);
+      color: var(--text);
+      cursor: pointer;
+      font-size: 0.875rem;
+      font-weight: 500;
+      transition: all 0.15s;
+    }
+    .done-btn:hover {
+      background: var(--bg);
+      border-color: var(--text-muted);
+    }
+    .done-btn.ready {
+      border: none;
+      background: var(--accent);
+      color: white;
+      font-weight: 600;
+    }
+    .done-btn.ready:hover {
+      background: var(--accent-hover);
+    }
+    /* ---- Done overlay ---- */
+    .done-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.5);
+      z-index: 100;
+      justify-content: center;
+      align-items: center;
+    }
+    .done-overlay.visible {
+      display: flex;
+    }
+    .done-card {
+      background: var(--surface);
+      border-radius: 12px;
+      padding: 2rem 3rem;
+      text-align: center;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+      max-width: 500px;
+    }
+    .done-card h2 {
+      font-size: 1.5rem;
+      margin-bottom: 0.5rem;
+    }
+    .done-card p {
+      color: var(--text-muted);
+      margin-bottom: 1.5rem;
+      line-height: 1.5;
+    }
+    .done-card .btn-row {
+      display: flex;
+      gap: 0.5rem;
+      justify-content: center;
+    }
+    .done-card button {
+      padding: 0.5rem 1.25rem;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      background: var(--surface);
+      cursor: pointer;
+      font-size: 0.875rem;
+    }
+    .done-card button:hover {
+      background: var(--bg);
+    }
+    /* ---- Toast ---- */
+    .toast {
+      position: fixed;
+      bottom: 5rem;
+      left: 50%;
+      transform: translateX(-50%);
+      background: var(--header-bg);
+      color: var(--header-text);
+      padding: 0.625rem 1.25rem;
+      border-radius: var(--radius);
+      font-size: 0.875rem;
+      opacity: 0;
+      transition: opacity 0.3s;
+      pointer-events: none;
+      z-index: 200;
+    }
+    .toast.visible {
+      opacity: 1;
+    }
+  </style>
+</head>
+<body>
+  <div id="app" style="height:100vh; display:flex; flex-direction:column;">
+    <div class="header">
+      <div>
+        <h1>Eval Review: <span id="skill-name"></span></h1>
+        <div class="instructions">Review each output and leave feedback below. Navigate with arrow keys or buttons. When done, copy feedback and paste into Claude Code.</div>
+      </div>
+      <div class="progress" id="progress"></div>
+    </div>
+
+    <!-- View tabs (only shown when benchmark data exists) -->
+    <div class="view-tabs" id="view-tabs" style="display:none;">
+      <button class="view-tab active" onclick="switchView('outputs')">Outputs</button>
+      <button class="view-tab" onclick="switchView('benchmark')">Benchmark</button>
+    </div>
+
+    <!-- Outputs panel (qualitative review) -->
+    <div class="view-panel active" id="panel-outputs">
+    <div class="main">
+      <!-- Prompt -->
+      <div class="section">
+        <div class="section-header">Prompt <span class="config-badge" id="config-badge" style="display:none;"></span></div>
+        <div class="section-body">
+          <div class="prompt-text" id="prompt-text"></div>
+        </div>
+      </div>
+
+      <!-- Outputs -->
+      <div class="section">
+        <div class="section-header">Output</div>
+        <div class="section-body" id="outputs-body">
+          <div class="empty-state">No output files found</div>
+        </div>
+      </div>
+
+      <!-- Previous Output (collapsible) -->
+      <div class="section" id="prev-outputs-section" style="display:none;">
+        <div class="section-header">
+          <div class="grades-toggle" onclick="togglePrevOutputs()">
+            <span class="arrow" id="prev-outputs-arrow">&#9654;</span>
+            Previous Output
+          </div>
+        </div>
+        <div class="grades-content" id="prev-outputs-content"></div>
+      </div>
+
+      <!-- Grades (collapsible) -->
+      <div class="section" id="grades-section" style="display:none;">
+        <div class="section-header">
+          <div class="grades-toggle" onclick="toggleGrades()">
+            <span class="arrow" id="grades-arrow">&#9654;</span>
+            Formal Grades
+          </div>
+        </div>
+        <div class="grades-content" id="grades-content"></div>
+      </div>
+
+      <!-- Feedback -->
+      <div class="section">
+        <div class="section-header">Your Feedback</div>
+        <div class="section-body">
+          <textarea
+            class="feedback-textarea"
+            id="feedback"
+            placeholder="What do you think of this output? Any issues, suggestions, or things that look great?"
+          ></textarea>
+          <div class="feedback-status" id="feedback-status"></div>
+          <div class="prev-feedback" id="prev-feedback" style="display:none;">
+            <div class="prev-feedback-label">Previous feedback</div>
+            <div id="prev-feedback-text"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="nav" id="outputs-nav">
+      <button class="nav-btn" id="prev-btn" onclick="navigate(-1)">&#8592; Previous</button>
+      <button class="done-btn" id="done-btn" onclick="showDoneDialog()">Submit All Reviews</button>
+      <button class="nav-btn" id="next-btn" onclick="navigate(1)">Next &#8594;</button>
+    </div>
+    </div><!-- end panel-outputs -->
+
+    <!-- Benchmark panel (quantitative stats) -->
+    <div class="view-panel" id="panel-benchmark">
+      <div class="benchmark-view" id="benchmark-content">
+        <div class="benchmark-empty">No benchmark data available. Run a benchmark to see quantitative results here.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Done overlay -->
+  <div class="done-overlay" id="done-overlay">
+    <div class="done-card">
+      <h2>Review Complete</h2>
+      <p>Your feedback has been saved. Go back to your Claude Code session and tell Claude you're done reviewing.</p>
+      <div class="btn-row">
+        <button onclick="closeDoneDialog()">OK</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div class="toast" id="toast"></div>
+
+  <script>
+    // ---- Embedded data (injected by generate_review.py) ----
+    const EMBEDDED_DATA = {"skill_name": "steelman-redteam", "runs": [{"id": "eval-1-with_skill", "prompt": "steelman and red team this for me: raising the minimum wage to $25/hour in the US would be net positive for low-income workers", "eval_id": 1, "outputs": [{"name": "response.md", "type": "text", "content": "## Steelman: Raising the federal minimum wage to $25/hour would be net positive for low-income workers\n\nThe core case rests on three mutually reinforcing pillars: purchasing power, monopsonistic labor markets, and the empirical record of recent large minimum wage increases.\n\n**The purchasing power argument is underrated.** The federal minimum wage of $7.25/hour has lost roughly 40% of its real value since 1968. A worker earning $7.25 today commands less than a worker earning the equivalent wage fifty years ago. A $25 minimum wage \u00e2\u20ac\u201d approximately what the 1968 minimum would be in 2024 dollars adjusted for productivity gains, not just inflation \u00e2\u20ac\u201d would restore the historical relationship between minimum compensation and the overall productive capacity of the economy. Low-income workers spend a far higher share of their income than high earners, so wage increases at the bottom circulate rapidly back into local economies, generating demand that partially offsets any employment costs.\n\n**Labor markets are not perfectly competitive \u00e2\u20ac\u201d they are monopsonistic.** The standard \"intro econ\" objection to minimum wage hikes assumes competitive markets where wages reflect marginal product. But low-wage labor markets are structurally monopsonistic: workers have limited mobility (due to transportation costs, geographic ties, childcare constraints), face information asymmetries, and are subject to coordination failures that suppress wages below the competitive equilibrium. In a monopsonistic market, a minimum wage floor doesn't destroy jobs \u00e2\u20ac\u201d it corrects the power imbalance, potentially *increasing* both wages and employment simultaneously. The concentration of low-wage employment in sectors like fast food, retail, and logistics \u00e2\u20ac\u201d dominated by large chains with pricing power \u00e2\u20ac\u201d is precisely the market structure where monopsony effects are strongest.\n\n**The empirical evidence from large increases supports limited disemployment.** The Seattle Minimum Wage Study (Dube et al.), the work of Arindrajit Dube across multiple datasets, and analysis of state-level minimum wage variation consistently find small or statistically insignificant employment effects even for moderate-to-large increases. California and New York City have implemented wages well above $15 with no observable employment catastrophe. More importantly, the research consistently finds that total earnings among low-wage workers increase even when some hours are reduced \u00e2\u20ac\u201d workers are better off in aggregate. The distributional evidence is particularly strong: minimum wage increases are among the most precisely targeted anti-poverty tools available, with benefits flowing overwhelmingly to workers in the bottom two income quintiles.\n\n**The knock-on effects compound over time.** Higher wages reduce turnover (reducing employer training costs), reduce reliance on public assistance programs (reducing fiscal burden), and may increase worker productivity through efficiency wage effects. The net public cost is therefore lower than the gross wage increase suggests.\n\nThe steelmanned claim: a $25 federal minimum wage would raise the living standards of roughly 33 million workers, correct for decades of real wage suppression at the bottom, and do so in labor market conditions structurally suited to absorb the increase with limited disemployment.\n\n---\n\n## Red Team: Against the Steelman\n\n**The $25 number is not calibrated to labor market conditions \u00e2\u20ac\u201d it's a political round number, and the magnitude matters enormously.** The empirical record supporting minimum wage increases is drawn almost entirely from studies of increases to $10, $12, or $15 \u00e2\u20ac\u201d not $25. A $25 federal minimum wage would represent a 245% increase over the current federal floor. The gap between studied policy and proposed policy is not a detail; it is the crux. Extrapolating from studies of moderate increases to a more-than-tripling of the minimum is methodologically unsound. Nonlinearities are real: small increases may be absorbed; large ones may not be.\n\n**The geographic heterogeneity problem is fatal to the federal framing.** Median wages vary dramatically across the US. In rural Mississippi or West Virginia, a $25 minimum wage would compress nearly the entire wage distribution \u00e2\u20ac\u201d it would exceed the median wage in many counties. The labor markets that would face the most disruptive impact are precisely those with the least capacity to absorb it: low-productivity regions, small businesses operating on thin margins, rural economies with no competitive pressure from alternative employers. The case for monopsony is strongest in urban, high-cost areas; it is weakest in rural low-wage regions. A federal floor at $25 forces conditions appropriate to San Francisco onto economies that structurally cannot bear them.\n\n**The monopsony argument proves too much.** If monopsony power is so pervasive and severe that wages are dramatically below competitive equilibrium, then we should observe large employer profits in low-wage industries. But fast food and retail operate on 2-5% net margins. Where is the monopsony rent? If employers aren't capturing large surplus, there is no room to compress margins to fund a wage increase \u00e2\u20ac\u201d the adjustment must come through reduced employment, reduced hours, accelerated automation, or price increases that partially offset wage gains for low-income consumers.\n\n**Automation risk is underweighted in the empirical literature.** Most studies of minimum wage effects look at short-run employment. Automation investment has long lags \u00e2\u20ac\u201d firms don't immediately install kiosks and robotic fryers, they do so over years as capital costs fall and labor costs rise. The long-run employment effects of a $25 wage may be substantially more negative than the short-run studies capture. McDonald's has already deployed automated ordering; warehouse automation is advancing rapidly. A $25 federal minimum would dramatically accelerate the business case for replacing low-wage workers, with effects falling hardest on the least-skilled workers the policy is meant to help.\n\n**\"Net positive for low-income workers\" is doing a lot of work.** If 30 million workers receive higher wages and 3 million lose jobs, is that net positive? The aggregate wage bill may increase while the employment-poor \u00e2\u20ac\u201d who are often disproportionately young, less-educated, minority, or recently entered the workforce \u00e2\u20ac\u201d bear concentrated losses. The workers who lose jobs or hours are not randomly distributed; they are the most marginal workers, often those the policy is nominally most concerned with protecting.\n\n---\n\n## Steelman: A $25 federal minimum wage would be net negative for low-income workers\n\nThe strongest counter-case is not \"markets are efficient so don't interfere.\" It is: even accepting that intervention is warranted, a blunt federal floor at $25 is the wrong tool, and its costs fall most heavily on the workers it claims to protect.\n\n**The geographic mismatch argument is decisive on its own.** The US is not one labor market. It is hundreds of overlapping regional economies with vastly different wage structures, productivity levels, and cost-of-living profiles. A $25 minimum in rural Alabama is not the same policy as a $25 minimum in Manhattan \u00e2\u20ac\u201d it is a qualitatively different intervention. In low-wage regions, a $25 floor would immediately exceed the median wage, eliminating the wage gradient that allows workers to be hired, trained, and promoted into higher-productivity roles. The result would be mass unemployment in the exact communities most economically vulnerable, with no local labor market mechanism for adjustment.\n\n**The low-skill penalty compounds over time.** A minimum wage creates a floor, but it also creates a barrier to entry. Employers who must pay $25/hour will not hire workers whose productivity they estimate below $25/hour. This is not hypothetical cruelty \u00e2\u20ac\u201d it is basic rational behavior under uncertainty. The workers most likely to fall below the productivity threshold are: young workers with no experience, workers with criminal records, workers with limited English proficiency, workers with disabilities, workers returning to the workforce after gaps. These are not abstract categories \u00e2\u20ac\u201d they are disproportionately minority workers and workers from the lowest income backgrounds. The minimum wage, when set high enough, functions as a credential barrier that excludes the least advantaged from the formal labor market entirely, pushing them into the informal economy or into permanent unemployment.\n\n**The fiscal offsetting argument cuts against the claim.** If a $25 minimum wage significantly reduces employment among low-income workers, they lose wages but also lose employer-provided benefits, and their remaining income from government transfer programs may not fully compensate. A worker who was earning $15,000/year from part-time low-wage work and supplementing with SNAP, Medicaid, and housing assistance is not obviously better off unemployed with full benefits \u00e2\u20ac\u201d both because the combination of work and benefits provided more total resources, and because employment provides non-monetary goods (structure, skill accumulation, social connection) that transfer programs do not replace.\n\n**The better policy exists.** The strongest version of the counter-claim is not \"do nothing\" \u00e2\u20ac\u201d it is \"there are better-targeted tools.\" The Earned Income Tax Credit, negative income tax proposals, and wage subsidies can raise low-income worker take-home pay without creating the employment floor that harms the most marginal workers. If the goal is to put more money in the hands of low-income workers, the EITC has a strong empirical track record of doing exactly that without the employment destruction risk. Choosing a $25 federal minimum wage over an expanded EITC is a policy choice with real victims.\n\n---\n\n## Red Team: Against the Counter-Claim's Steelman\n\n**The geographic heterogeneity argument proves too much \u00e2\u20ac\u201d it proves that there should be no federal minimum wage, not that $25 is wrong.** The current $7.25 federal minimum also creates regional mismatches; Mississippi's labor market is different from New York's under the current law too. If the argument is that federal floors are always inappropriate because of geographic variation, that's a case against the minimum wage institution entirely, not against a specific level. If the argument is only about magnitude, then it concedes the principle and becomes an empirical dispute about what level is right \u00e2\u20ac\u201d which is a much weaker position.\n\n**The \"low-skill penalty\" argument assumes a fixed productivity hierarchy.** The concern that workers below the $25 productivity threshold get excluded treats productivity as a fixed characteristic of workers rather than a function of investment, training, and institutional context. When wages are higher, employers invest more in training (because the worker is worth more), workers invest more in skill acquisition (because returns are higher), and the productivity threshold shifts upward. The empirical literature on high-minimum-wage regimes in Scandinavia and parts of Germany does not show the permanent underclass exclusion effects the theory predicts. Tight labor markets with high floors can compress the productivity distribution upward.\n\n**The EITC-as-alternative argument has a well-documented flaw.** The EITC is funded by general taxpayers, including low-income workers, while the benefits of a minimum wage are paid by employers. The EITC can function as a subsidy to low-wage employers \u00e2\u20ac\u201d when the government tops up wages, employers can offer lower wages than they otherwise would, capturing part of the subsidy as higher profit. There is empirical evidence this effect is real. A minimum wage forces employers to pay a floor; an EITC lets them free-ride on the public subsidy. For workers, an EITC expansion without a minimum wage floor may be partially captured by employer wage suppression.\n\n**The \"automation\" objection proves too much across time.** Every labor cost increase in history has prompted predictions of mass technological unemployment \u00e2\u20ac\u201d from the mechanization of agriculture to ATMs to containerization. These predictions have consistently proven wrong in aggregate, though they were right about specific jobs. The issue is not whether some jobs get automated, but whether new jobs emerge to replace them and whether the gains to workers in surviving jobs outweigh the losses to displaced workers. The historical record is, at minimum, not a slam-dunk for the \"automation catastrophe\" prediction.\n\n---\n\n## Synthesis\n\n**What survived red-teaming:**\n\nFrom the steelman side: The monopsony correction argument and the purchasing power argument survived in weakened form. There is genuine evidence that labor markets are not perfectly competitive and that moderate minimum wage increases do not produce large disemployment effects. The empirical record through $15/hour is relatively solid.\n\nFrom the counter-claim side: The geographic heterogeneity argument survived substantially. A $25 federal floor would create genuinely different conditions in rural low-wage economies than in high-cost urban markets. The magnitude question \u00e2\u20ac\u201d whether the empirical evidence at $12-15 extrapolates to $25 \u00e2\u20ac\u201d also survived. The red team on the counter-claim weakened the EITC argument (employer capture) and the productivity-floor argument (productivity is malleable), but it did not eliminate the core geographic concern.\n\n**What converges:**\n\nBoth sides implicitly agree that the harm of minimum wage increases is most likely to fall on the most marginal workers \u00e2\u20ac\u201d the youngest, least-skilled, and most economically precarious. The steelman minimizes this risk; the counter-claim maximizes it. Both sides also agree that the existing federal minimum is indefensibly low. The dispute is about magnitude and mechanism, not principle.\n\n**What genuinely contradicts:**\n\nThe core contradiction is an unresolved empirical question: does the labor market evidence from moderate increases ($10-$15) extend to a $25 federal floor? This depends on whether disemployment effects are linear or nonlinear in the size of the increase, and no strong empirical evidence resolves this because the policy has not been implemented at this scale nationally. It also depends on geographic labor market structure: in monopsonistic urban markets, $25 may clear; in competitive rural markets, it likely will not.\n\n**The reasoning chain:**\n\n1. The steelman is strong on the mechanism (monopsony correction, real wage recovery) and on the evidence for moderate increases. It weakens significantly on the $25 threshold specifically and on geographic heterogeneity.\n\n2. The red team on the steelman lands hardest on magnitude extrapolation and geographic applicability \u00e2\u20ac\u201d these are the genuinely damaging objections.\n\n3. The counter-claim steelman is strongest on the geographic mismatch and on the most-marginal-worker exclusion concern. It is weaker than it appears on the EITC alternative (due to employer capture effects) and on automation timing.\n\n4. The red team on the counter-claim partially rehabilitates the steelman by showing the productivity argument is not as fixed as assumed and that the EITC alternative has its own problems. But it does not overcome the geographic heterogeneity problem.\n\n**Final verdict:**\n\nThe claim as stated \u00e2\u20ac\u201d that a $25 federal minimum wage would be *net positive* for low-income workers \u00e2\u20ac\u201d is probably false, and the falseness is not close-call. The key failure is the \"federal\" framing combined with the $25 number. The empirical case for minimum wage increases is meaningful but is built on evidence from more modest increases and from urban labor markets where the increases are most defensible. A $25 federal floor would impose conditions calibrated for high-cost urban markets onto hundreds of rural and lower-productivity regional economies, producing concentrated disemployment among the most marginal workers in those areas.\n\nIf the claim were \"raising minimum wages substantially above the current $7.25 federal floor would be net positive for most low-income workers in high-cost labor markets,\" the answer would likely be yes. If the claim were \"a phased, regionally differentiated approach reaching $25 in high-cost metros but lower elsewhere would be net positive,\" the evidence is more supportive. But a uniform $25 federal floor applied to the full geographic diversity of US labor markets is a blunt instrument that, at that magnitude, is more likely to harm than help the most economically vulnerable workers \u00e2\u20ac\u201d the ones least able to meet the productivity threshold it sets.\n\nThe honest bottom line: the direction is right, the mechanism is partially right, the number and the mechanism of implementation are wrong.\n"}], "grading": null}, {"id": "eval-1-without_skill", "prompt": "steelman and red team this for me: raising the minimum wage to $25/hour in the US would be net positive for low-income workers", "eval_id": 1, "outputs": [{"name": "response.md", "type": "text", "content": "# Steelman and Red Team: Raising the Minimum Wage to $25/Hour Would Be Net Positive for Low-Income Workers\n\n---\n\n## STEELMAN: The Strongest Case FOR\n\n### 1. The Current Federal Minimum Wage Has Lost Enormous Real Value\n\nThe federal minimum wage has been $7.25/hour since 2009 \u00e2\u20ac\u201d the longest stretch without an increase in US history. Adjusted for inflation, the purchasing power of the minimum wage peaked in 1968 at roughly $13\u00e2\u20ac\u201c14 in today's dollars. A $25 floor would not be radical; it would be a meaningful restoration of purchasing power that workers have been steadily losing for decades. Low-income workers have effectively received a sustained pay cut through inflation year after year.\n\n### 2. Low-Wage Workers Have a High Marginal Propensity to Consume\n\nEconomists broadly agree that lower-income households spend a much higher share of additional income compared to wealthy households. A significant wage increase funnels money directly into local economies \u00e2\u20ac\u201d groceries, rent, childcare, transportation \u00e2\u20ac\u201d generating multiplier effects that stimulate demand and can partially offset employer cost increases. The Congressional Budget Office (CBO) and others have modeled scenarios where aggregate consumer demand rises enough to support some of the jobs that might otherwise be lost.\n\n### 3. Empirical Evidence from State-Level Increases Is Encouraging\n\nOver the past decade, more than two dozen states have raised their minimum wages significantly above the federal level, and several cities (Seattle, San Francisco, New York) have phased in $15\u00e2\u20ac\u201c$20+ floors. Extensive academic research \u00e2\u20ac\u201d including influential work by economists Dube, Reich, and Zipperer \u00e2\u20ac\u201d finds that moderate-to-significant minimum wage increases in these jurisdictions did not produce the large employment losses predicted by simple supply-and-demand models. Workers' incomes rose, poverty rates fell, and restaurant and retail employment remained broadly stable in most cases.\n\n### 4. Monopsony Power Suppresses Wages Below Market-Clearing Levels\n\nClassical economics assumes competitive labor markets, but low-wage labor markets are often characterized by monopsony (employer-side market power). Large employers like Amazon, Walmart, and fast food chains can set wages below competitive levels because workers face high switching costs, limited local alternatives, and information asymmetries. When markets are monopsonistic, raising the minimum wage can actually increase both employment and wages simultaneously \u00e2\u20ac\u201d it forces wages closer to the true competitive equilibrium. This is not a fringe view; it appears in mainstream labor economics journals and has influenced Federal Reserve thinking.\n\n### 5. Reduces Reliance on Public Assistance \u00e2\u20ac\u201d a Hidden Subsidy Paid by Taxpayers\n\nA substantial share of fast food workers, Walmart employees, and other low-wage workers rely on SNAP, Medicaid, and housing assistance even while employed full-time. Estimates suggest that taxpayers spend tens of billions of dollars annually subsidizing wages at large, profitable corporations. Raising the minimum wage shifts this cost back to employers and shareholders, reduces the social safety net burden, and reduces the implicit taxpayer subsidy to low-wage business models.\n\n### 6. Reduces Inequality and Its Associated Harms\n\nThe US has among the highest levels of income inequality in the developed world. Research consistently links high inequality to worse health outcomes, lower social mobility, higher crime rates, and lower life satisfaction. A higher wage floor directly compresses the bottom of the income distribution. For low-income workers specifically, the wage gain is not merely financial \u00e2\u20ac\u201d it translates into dignity, reduced financial stress, better health outcomes, and more stable family environments.\n\n### 7. Long Phase-In Periods Allow Adjustment\n\nNo serious proposal calls for an overnight jump to $25. A 5\u00e2\u20ac\u201c7 year phased increase gives businesses time to adjust prices, improve productivity, automate selectively, and absorb costs gradually. Inflation distributes some of the cost adjustment across the economy broadly. A long runway dramatically reduces the risk of disruptive employment shocks.\n\n### 8. The Counterfactual Is Not Zero Cost\n\nCritics focus on potential job losses from a wage increase, but they rarely account for the significant harms of the status quo: chronic poverty, high worker turnover (which imposes substantial costs on employers), workers holding multiple jobs with limited time for family or civic life, and the drag on consumer demand from an economy where wages at the bottom have stagnated for generations. The policy question is not \"wage floor vs. perfect market\" but \"wage floor vs. continued stagnation.\"\n\n---\n\n## RED TEAM: The Strongest Case AGAINST\n\n### 1. $25/Hour Is Economically Disconnected from Most of the Country\n\nThe US is not one labor market. A $25/hour minimum in San Francisco or Manhattan may be reasonable. In rural Mississippi, West Virginia, or the Texas panhandle, the median wage for many occupations is only marginally above that level. Imposing a single national floor calibrated to high-cost metros effectively destroys the economic viability of entire categories of employment in low-cost regions. The CBO's 2021 analysis of a $15 federal minimum estimated 1.4 million job losses nationally; scaling to $25 could produce losses several times larger, concentrated in exactly the regions with the most vulnerable low-wage workers.\n\n### 2. The Employment Destruction Will Disproportionately Harm the Most Vulnerable\n\nMinimum wage increases do not affect all low-income workers equally. The workers most likely to lose jobs or hours are those with the least labor market power: teenagers entering the workforce for the first time, workers with criminal records, workers without high school diplomas, undocumented workers, and workers in sectors with thin margins. These workers may be precisely the ones who need a foothold in the labor market most. A policy that raises wages for those who keep their jobs while pricing others out entirely may be a regressive redistribution within the low-income population.\n\n### 3. Small Businesses Cannot Absorb the Shock the Way Large Corporations Can\n\nWalmart and Amazon can absorb a wage increase, automate, or pass costs to consumers with relative ease. A family-owned restaurant, small retailer, or local childcare provider has no such cushion. Profit margins in food service often run 3\u00e2\u20ac\u201c5%. A 50\u00e2\u20ac\u201c150% labor cost increase \u00e2\u20ac\u201d even phased in \u00e2\u20ac\u201d could be existential for many small businesses. The outcome could be market consolidation that leaves large corporations even more dominant in low-wage labor markets, with fewer employers competing for workers over time.\n\n### 4. Automation Acceleration Could Eliminate More Jobs Than It Saves\n\nWage increases do not just reduce headcount \u00e2\u20ac\u201d they dramatically accelerate the business case for automation. Kiosk ordering, automated inventory, robotic food preparation, self-checkout, and AI-driven customer service are already commercially available. At $7.25/hour, the payback period on a $50,000 kiosk system is long. At $25/hour, it becomes very short. The result is not simply that some workers earn more \u00e2\u20ac\u201d it is that the categories of work available to low-skill workers shrink permanently, making future re-entry into the labor market harder.\n\n### 5. Inflation Can Erode the Real Wage Gains\n\nA significant minimum wage increase affects a large share of the US workforce and cost structures across the service economy. Businesses will raise prices. When low-income workers spend more at these same businesses, the real purchasing power gain is partially offset. If inflation is broad-based, workers on fixed incomes (elderly, disabled) who are not minimum wage earners may be made worse off. The net real wage gain for minimum wage workers may be substantially smaller than the nominal increase implies.\n\n### 6. The Empirical Literature Does Not Clearly Generalize to $25\n\nStudies showing limited employment effects typically examine increases in the range of $1\u00e2\u20ac\u201c$4/hour, often in local areas with already-higher median wages. Extrapolating these findings to a more than tripling of the federal minimum wage is a significant leap. The underlying economics are non-linear \u00e2\u20ac\u201d a 10% wage increase and a 200% wage increase are categorically different in terms of adjustment pressure. The research base that steelman advocates cite does not actually study increases of this magnitude.\n\n### 7. It May Reduce Hours and Benefits More Than It Reduces Headcount\n\nEmployers facing higher labor costs have multiple margins of adjustment beyond layoffs: cutting hours (moving workers from 35 hours to 28 hours to avoid benefit thresholds), reducing non-wage benefits (employer-provided health insurance, paid leave, meals), intensifying work pace, or eliminating break time and flexibility. Many of these adjustments are hard to observe in aggregate employment data. A worker who keeps their job but loses employer-subsidized health insurance and sees their hours cut by 20% may be worse off in total compensation even as the headline wage rises.\n\n### 8. Timing and Economic Context Matter Enormously\n\nA $25 minimum wage imposed during a period of high inflation, rising interest rates, or recession could have far worse employment effects than the same policy during a period of strong growth and tight labor markets. Locking in a specific dollar figure nationally, regardless of economic conditions or regional variation, removes the flexibility that good policy requires. A wage floor that makes sense in 2026 conditions may be highly disruptive in a recession or in a future era of rapid AI-driven labor displacement.\n\n### 9. It May Reduce Work Incentives at the Margin\n\nA $25/hour minimum wage intersects with the structure of means-tested benefit programs in complex ways. Some low-income workers who rely on SNAP, Medicaid, housing vouchers, and EITC may face implicit marginal tax rates well above 50% once these benefits phase out. For some workers \u00e2\u20ac\u201d particularly those with childcare costs \u00e2\u20ac\u201d the net gain from earning $25/hour vs. $12/hour may be quite small after accounting for lost benefits and increased costs. This does not mean the policy is wrong, but it means the \"net positive\" claim for individual workers requires careful benefit-cliff modeling that is rarely done in public advocacy.\n\n---\n\n## Summary\n\nThe steelman case is genuinely strong: the federal minimum wage has eroded dramatically in real terms, monopsony dynamics suppress wages below competitive levels, and state-level evidence shows higher wages are achievable without catastrophic job losses. A well-designed, phased increase could meaningfully raise living standards for tens of millions of workers.\n\nThe red team case is also genuinely strong: $25 is calibrated to high-cost cities, not a national median; automation risk is real and growing; small businesses face existential pressure that large corporations do not; and the empirical literature simply does not provide good evidence about increases of this magnitude. The workers most likely to be harmed are among the most vulnerable.\n\nA rigorous assessment would conclude: a $15\u00e2\u20ac\u201c$18 federal minimum with regional adjustment mechanisms has a reasonably strong evidence base behind it. A flat $25 national minimum involves substantially more uncertainty, and the risk that it harms the specific low-income workers it is designed to help is non-trivial rather than dismissible.\n"}], "grading": null}, {"id": "eval-2-with_skill", "prompt": "Can you steelman and red team the idea that social media has made teenage mental health significantly worse?", "eval_id": 2, "outputs": [{"name": "response.md", "type": "text", "content": "## Steelman: Social media has made teenage mental health significantly worse\n\nThe case here is not that social media is mildly correlated with some distress \u00e2\u20ac\u201d it's that it constitutes a historically significant harm, one that partially explains the documented deterioration in adolescent mental health that began around 2012 and has continued since.\n\nThe empirical foundation is substantial. Across the US, UK, Canada, and Australia, rates of teenage depression, anxiety, self-harm, and suicide attempts rose sharply among adolescents \u00e2\u20ac\u201d especially girls \u00e2\u20ac\u201d starting in the early 2010s. The timing is precise: it tracks the saturation-level adoption of smartphones and Instagram, not gradual cultural drift. This is not a correlation easily dismissed. Jean Twenge's longitudinal work and Jonathan Haidt and Jean Twenge's co-authored analyses show that screen time, particularly social-media-heavy phone use, is one of the few variables that actually predicts the magnitude of change across different demographic groups and countries simultaneously. When the same inflection point appears across multiple nations at the same time, and the main common variable is a single technology's adoption, the burden of proof shifts toward causation.\n\nThe mechanisms are well-specified and biologically plausible:\n\n1. **Social comparison at scale and speed**: Adolescents have always compared themselves to peers, but social media compresses this into a continuous, curated feed of bodies, lifestyles, and peer attention. For teenage girls in particular, platforms like Instagram and TikTok algorithmically surface idealized appearance content. The internal documents leaked from Meta in 2021 showed Facebook's own researchers had concluded Instagram made body-image issues worse for one in three teenage girls. This isn't advocacy research \u00e2\u20ac\u201d it's the company's own findings.\n\n2. **Displacement of high-quality activities**: Time on social media is not neutral time \u00e2\u20ac\u201d it crowds out sleep, in-person socializing, and unstructured play, all of which have robust independent associations with adolescent wellbeing. A teenager spending 4 hours daily on TikTok is 4 hours less asleep, exercising, or having the awkward face-to-face conversations that build social resilience.\n\n3. **Cyberbullying and chronic social surveillance**: The social cruelties of adolescence have always existed, but they previously had natural endpoints \u00e2\u20ac\u201d leaving school, going home. Social media makes social threat omnipresent and 24/7. For children predisposed to anxiety, this constant monitoring of social standing, likes, and group dynamics is a qualitatively different burden, not just a quantitative increase.\n\n4. **The dopamine loop and loss of distress tolerance**: Platform designs optimized for engagement \u00e2\u20ac\u201d variable reward schedules, infinite scroll, notification pings \u00e2\u20ac\u201d are specifically engineered to capture and hold attention. Adolescent brains, still developing impulse control and emotional regulation, are particularly susceptible. Regular exposure to these systems may impair the development of distress tolerance precisely because they deliver instant social feedback that interrupts discomfort.\n\nThe convergence of timing, cross-national consistency, plausible mechanism, and insider confirmation makes this one of the stronger causal claims in adolescent epidemiology.\n\n---\n\n## Red Team: Against the Steelman\n\nThe steelman is more compelling than most popular versions of this claim, but its evidentiary pillars are shakier than they first appear.\n\n**The correlation-causation problem is not fully resolved.** The timing argument \u00e2\u20ac\u201d \"it started around 2012\" \u00e2\u20ac\u201d is less precise than claimed. Depending on the dataset and the outcome measure, the inflection point shifts. Some researchers (Amy Orben, Andrew Przybylski) have conducted pre-registered analyses on the same large datasets Twenge uses and find effect sizes for social media on adolescent wellbeing that are comparable in magnitude to wearing glasses or eating potatoes \u00e2\u20ac\u201d statistically detectable but trivially small. They argue the Twenge/Haidt camp has selectively analyzed data and that once you properly correct for researcher degrees of freedom, the signal shrinks dramatically.\n\n**The comparison base is contested.** How well were we actually measuring teenage mental health before 2012? Diagnostic criteria shifted. Awareness campaigns likely increased help-seeking and self-identification. The steelman assumes we're measuring the same thing over time; there's a real possibility we're partly observing a reporting artifact as mental health literacy increased across the same period social media grew.\n\n**The Meta internal documents do not prove what the steelman implies.** The \"one in three teenage girls\" finding was from qualitative focus groups, not epidemiological survey data. The internal memo was preliminary, contested internally, and was specifically about Instagram's effect on body image in a subset of already-at-risk users \u00e2\u20ac\u201d not a finding about psychiatric harm in the general population.\n\n**Reverse causation is underweighted.** Adolescents experiencing depression and anxiety plausibly retreat to social media as a coping mechanism \u00e2\u20ac\u201d passive scrolling, social reassurance-seeking \u00e2\u20ac\u201d rather than becoming depressed because of it. Longitudinal studies that attempt to establish directionality (does social media use at time T predict depression at T+1 after controlling for T-level depression?) show much weaker effects than cross-sectional studies. The experience-sampling methods that capture in-the-moment affect during social media use tend to show neutral or mixed effects, not consistent harm.\n\n**The cross-national consistency cuts two ways.** Yes, the mental health decline appeared broadly across Western countries. But those countries also shared other simultaneous changes: economic precarity post-2008, helicopter parenting that reduced childhood independence, a cultural shift toward emotional expressivity and psychological framing of suffering. Attributing the decline specifically to social media requires ruling out these confounders, which has not been done rigorously.\n\nThe steelman makes the strongest available case, but the honest summary is: we have a moderately-sized correlational signal, contested effect sizes, plausible mechanisms, and incomplete causal identification. \"Significantly worse\" remains an inference, not an established fact.\n\n---\n\n## Steelman: Social media has not made teenage mental health significantly worse\n\nThe claim that social media caused a mental health crisis overstates the evidence and reflects a recurring cultural tendency to blame the latest technology for social ills that have deeper roots.\n\nThe effect sizes, when measured carefully, are small. Orben and Przybylski's 2019 analysis in Nature Human Behaviour, using the same large datasets as Twenge, found that social media use explained roughly 0.4% of the variance in adolescent wellbeing. To calibrate: that's smaller than the wellbeing association with wearing corrective lenses or eating breakfast regularly. If social media were the primary driver of a mental health crisis, we would expect to see substantially stronger effects than this. The association exists but is inconsistent in direction, dependent on the specific outcome measure, and sensitive to methodological choices.\n\nThe cross-national comparison actually weakens the social-media hypothesis on closer inspection. Nordic countries with high smartphone penetration have not seen equivalent crisis-level mental health deterioration. Some Asian countries with extremely high teenage social media use \u00e2\u20ac\u201d South Korea, Japan \u00e2\u20ac\u201d have distinct mental health profiles not predicted by the US model. If social media were acting as a near-universal harm, we would expect much more consistent international patterns than we observe.\n\nThe benefits of social media for adolescents are systematically underweighted in public discourse. For LGBTQ+ teenagers in non-affirming environments, social media provides access to community, identity development resources, and peer connection that would otherwise be unavailable. For teenagers with social anxiety, chronic illness, or minority identities, online community may be net positive. Sonia Livingstone's research on UK adolescents consistently finds that most teenagers describe social media as broadly positive and that the minority who experience harms are a specific subgroup, often already vulnerable before platform use.\n\nThe alternative explanations for rising teen distress are substantive and underexamined. Academic pressure has intensified \u00e2\u20ac\u201d standardized testing, college admissions competition, credential inflation. Economic insecurity post-2008 has materially changed what teenagers expect their futures to look like. The erosion of unstructured time, physical activity, and neighborhood independence has proceeded for decades, driven by parental risk-aversion and urban design, not smartphones. Climate anxiety among Gen Z is documented and real. If you assign even partial causal weight to these factors, the social media contribution shrinks accordingly.\n\nThe moral panic framing matters. Every generation of adults has attributed adolescent distress to a new medium: comics in the 1950s, television in the 1970s, video games in the 1990s. Each moral panic generated regulatory proposals, congressional hearings, and expert consensus that later proved largely unfounded. The current discourse has structural similarities. This doesn't mean the concern is wrong \u00e2\u20ac\u201d but it should raise the prior that we're pattern-matching to existing fears rather than identifying novel causation.\n\n---\n\n## Red Team: Against the Counter-Claim's Steelman\n\nThe counter-claim makes several valid methodological points but overshoots the evidence in the other direction.\n\n**The \"effect sizes are small\" argument proves too much.** Individual-level survey measures of wellbeing are notoriously noisy, and small variance explained in population-level regressions is entirely compatible with large effects on at-risk subgroups. If social media harms primarily adolescents with pre-existing vulnerabilities \u00e2\u20ac\u201d and those are precisely the teenagers we most care about \u00e2\u20ac\u201d then population-average effect sizes will underrepresent clinically significant harm. The effect size argument is a methodological critique, not evidence that the harm doesn't exist.\n\n**The Nordic exception is weaker than it appears.** Denmark, Sweden, and Norway have substantially stronger social safety nets, more regulated school environments, and different cultural norms around emotional expression and help-seeking. These are not controlled comparisons to the US case \u00e2\u20ac\u201d they're countries that differ on nearly every relevant variable. The absence of a crisis in Norway is not strong evidence that social media is harmless; it may be evidence that social support systems can buffer harms that are still real.\n\n**The \"moral panic\" framing is an ad hominem disguised as methodology.** That previous technology panics were exaggerated does not entail this one is. The reference class is wrong: concerns about comic books never had corroborating internal industry documents showing harm, never had multiple independent epidemiological datasets pointing in the same direction, and never involved mechanisms (algorithmic amplification, dopamine-optimized notifications) that were specifically engineered for engagement at the expense of wellbeing. Invoking moral panic history is a rhetorical move, not an argument.\n\n**The benefits-for-LGBTQ-youth point is real but irrelevant to the aggregate claim.** The steelman of the original position never claimed social media harms everyone equally. A policy can cause net aggregate harm while providing meaningful benefits to specific subgroups. These are not mutually exclusive. The counter-claim uses the partial-benefit case to deny the overall-harm case \u00e2\u20ac\u201d that's a non sequitur.\n\n**Most importantly, the counter-claim steelman cannot explain the timing and the severity of the female-specific outcome spike.** Rates of teenage girls being hospitalized for self-harm did not merely increase slightly \u00e2\u20ac\u201d in the US and UK they roughly doubled in the space of a decade. The counter-claim needs a rival explanation for this specific, severe, gendered, rapidly-emerging phenomenon. \"Academic pressure\" and \"economic anxiety\" are real but they existed before 2012, affect boys as much as girls, and don't obviously explain a doubling of hospitalization rates. Social media \u00e2\u20ac\u201d particularly image-focused platforms with algorithmic amplification of idealized bodies \u00e2\u20ac\u201d does explain this specificity. The counter-claim's best alternative explanations are diffuse where the original claim is precise.\n\n---\n\n## Synthesis\n\n**What survived red-teaming?**\n\nFrom the original claim: the timing evidence, the female-specific severity of the outcome spike, the plausible and specific mechanisms (appearance-focused platforms, displacement of sleep and face-to-face interaction, 24/7 social surveillance), and the insider corroboration from Meta's own research. These are not destroyed by the methodological critiques \u00e2\u20ac\u201d they are weakened, but they remain the most specific explanation available for a specific, documented phenomenon.\n\nFrom the counter-claim: the population-average effect sizes are genuinely small. The benefits for specific subgroups (LGBTQ+ youth, isolated teenagers) are real. Alternative structural explanations (academic pressure, erosion of childhood independence) are underweighted in popular discourse. The moral-panic-history point is weak as an argument but valid as a calibration check.\n\n**What converges?**\n\nBoth sides agree that: the mental health data shows a real deterioration (this is not a measurement artifact, though it may be partly one); the effects are heterogeneous (not all teenagers, not all platforms, not all outcomes); and the causal chain is not fully established at the level of a controlled experiment.\n\n**What genuinely contradicts?**\n\nThe core dispute is empirical and unresolved: are the small population-average effect sizes evidence that social media's contribution is minor, or are they consistent with large harms concentrated in vulnerable subgroups that get diluted in aggregate analysis? This is a genuine methodological disagreement between careful researchers who have looked at the same data. It cannot be resolved by argument \u00e2\u20ac\u201d it requires better study designs (randomized experiments, longer longitudinal follow-up, richer outcome measurement).\n\n**Reasoning chain:**\n\nThe steelman of the original claim is its strongest where the evidence is most specific: a female-specific, rapidly-emerging, severity-level mental health deterioration that tracks the adoption of image-focused social platforms. The red team of the steelman correctly identifies that effect sizes are contested and causal identification is incomplete, but cannot fully account for why these critiques would generate spuriously specific patterns. The counter-claim's steelman is strongest on methodology and the risk of moral panic reasoning, but weakest where it most needs to be: it lacks a rival explanation for the specific severity and gender asymmetry of the crisis. The red team of the counter-claim exploits this gap effectively.\n\n**Final verdict:**\n\nSocial media has probably made teenage mental health meaningfully worse, particularly for adolescent girls, and particularly via appearance-focused, algorithmically-amplified platforms. The evidence does not support the stronger claim that social media is the primary or sufficient cause of a generation-wide mental health crisis \u00e2\u20ac\u201d the causal picture is messier and multiple factors are at work. But the specific combination of timing, gender asymmetry, insider documentation, and mechanistic plausibility meets the threshold for \"significantly worse\" in the sense that a real and practically important harm is likely being caused, not merely observed in noise.\n\nThe key unresolved crux is not \"did social media cause any harm\" \u00e2\u20ac\u201d it probably did \u00e2\u20ac\u201d but \"how much of the deterioration is attributable to social media versus co-occurring structural changes in adolescent life.\" That question requires experimental and quasi-experimental evidence that does not yet exist at sufficient scale. Until it does, the precautionary case for delaying smartphone and social media access in early adolescence is stronger than the evidence against the original claim suggests.\n"}], "grading": null}, {"id": "eval-2-without_skill", "prompt": "Can you steelman and red team the idea that social media has made teenage mental health significantly worse?", "eval_id": 2, "outputs": [{"name": "response.md", "type": "text", "content": "# Steelman and Red Team: Social Media Has Made Teenage Mental Health Significantly Worse\n\n---\n\n## Part 1: The Steelman \u00e2\u20ac\u201d The Strongest Case That Social Media Has Harmed Teen Mental Health\n\nA steelman presents the most charitable, rigorous, and well-evidenced version of an argument \u00e2\u20ac\u201d the version its best proponents would endorse.\n\n### 1. The Timing Correlation Is Hard to Dismiss\n\nTeen mental health indicators in the United States (and many other countries) began deteriorating markedly around 2012\u00e2\u20ac\u201c2013 \u00e2\u20ac\u201d precisely when smartphone ownership and social media use became widespread among adolescents. Jean Twenge's longitudinal research using large national datasets (the Youth Risk Behavior Survey, the Monitoring the Future study, and others) documents sharp increases in rates of depression, loneliness, anxiety, and suicidal ideation among teens \u00e2\u20ac\u201d particularly girls \u00e2\u20ac\u201d starting around this inflection point. The timing is not random noise: it coincides with the mass adoption of Instagram (launched 2010), Snapchat (2011), and the smartphone as a primary teen device.\n\nThe fact that similar trends appeared across multiple countries with similar timing \u00e2\u20ac\u201d the UK, Canada, Australia, New Zealand \u00e2\u20ac\u201d strengthens the case that a global technology shift, rather than a US-specific policy or economic variable, is driving the effect.\n\n### 2. Mechanisms Are Plausible and Empirically Grounded\n\nThe steelman does not rely on correlation alone. There are several credible causal mechanisms:\n\n**Social comparison and upward comparison pressure.** Social media platforms curate and broadcast idealized self-presentations. Adolescents \u00e2\u20ac\u201d whose identities are still forming and who are developmentally sensitive to social standing \u00e2\u20ac\u201d are exposed to an endless stream of peers appearing more attractive, more socially successful, more accomplished. Experimental studies consistently show that exposure to idealized social media content increases body dissatisfaction and negative affect, particularly among girls.\n\n**Displacement of sleep.** Heavy social media use is correlated with later bedtimes, shorter sleep duration, and poorer sleep quality among adolescents. Sleep deprivation is itself a robust predictor of depression, anxiety, and irritability. This displacement mechanism does not require social media to be intrinsically harmful \u00e2\u20ac\u201d the time-theft alone is damaging.\n\n**Displacement of in-person social interaction.** Time spent on social media displaces time that might otherwise be spent in face-to-face socializing, physical activity, and unstructured play \u00e2\u20ac\u201d all of which have protective effects on mental health. Even if social media were emotionally neutral, displacing these healthier activities would be net harmful.\n\n**Cyberbullying and harassment.** Online harassment is qualitatively different from pre-digital bullying: it is continuous (there is no safe \"off\" space), public (humiliation can be broadcast to hundreds or thousands), and persistent (content does not disappear). Adolescents who are victims of cyberbullying show significantly elevated rates of depression, anxiety, and suicidal ideation.\n\n**Algorithmic amplification of distress.** Platform recommendation algorithms are optimized for engagement, and emotionally activating content \u00e2\u20ac\u201d particularly content that provokes anxiety, outrage, and social comparison \u00e2\u20ac\u201d drives higher engagement. Teens who interact with content about body image, self-harm, or eating disorders may be algorithmically served progressively more extreme content in these categories. Frances Haugen's disclosure of internal Facebook research showed that the company's own researchers identified Instagram's role in worsening body image among teenage girls.\n\n**Reduced offline relationship depth.** Research suggests that large quantities of weak-tie online connections do not substitute for the psychological benefits of a smaller number of close, high-quality friendships. Social media may produce an illusion of social connection while actually leaving teens lonelier in the ways that matter most.\n\n### 3. Gender Asymmetry Is Consistent with Mechanism, Not Just Correlation\n\nThe mental health deterioration is substantially larger for teenage girls than boys. This is exactly what social comparison and appearance-focused mechanisms would predict: Instagram and TikTok are heavily appearance-focused; girls face greater cultural pressure around physical attractiveness; girls also tend to use more socially intensive platforms (Instagram, Snapchat) while boys lean toward gaming and YouTube. This gender specificity makes it harder to attribute the trend purely to economic stressors, academic pressure, or other confounds that would affect both genders similarly.\n\n### 4. Internal Industry Evidence\n\nPerhaps the most damaging evidence for the steelman is internal. Facebook's own research (leaked in 2021) found that 32% of teenage girls said that when they felt bad about their bodies, Instagram made them feel worse. The company internally identified and then downplayed this evidence. The existence of internal industry knowledge of harm \u00e2\u20ac\u201d and the decision to suppress and not act on it \u00e2\u20ac\u201d mirrors the tobacco industry playbook and gives the steelman significant moral force beyond the empirical debate.\n\n### 5. Dose-Response Relationships\n\nStudies examining heavy users versus light users find that more hours per day of social media use is associated with worse mental health outcomes in a dose-response pattern. Experimental studies where participants are randomly assigned to reduce social media use \u00e2\u20ac\u201d including a well-known 2018 study by Hunt et al. \u00e2\u20ac\u201d show that reduced use produces measurable improvements in well-being, loneliness, and depressive symptoms compared to controls. Randomized designs are far more causally compelling than correlational studies.\n\n### 6. The Null Hypothesis Requires Implausible Assumptions\n\nA complete skeptic must argue that the arrival of a technology that: exposes teens to constant social comparison, enables around-the-clock harassment, displaces sleep, reduces face-to-face time, and is engineered by billion-dollar companies to maximize engagement at all costs \u00e2\u20ac\u201d had no net negative effect on adolescent mental health. This is an extraordinary claim that requires a large body of null evidence to sustain. The steelman argues that the burden of proof should lie with those claiming no harm, not with those claiming harm.\n\n---\n\n## Part 2: The Red Team \u00e2\u20ac\u201d The Strongest Challenges to This Claim\n\nA red team does not argue that social media is harmless. It challenges the specific, strong claim that social media has made teenage mental health *significantly* worse \u00e2\u20ac\u201d identifying weaknesses in evidence, alternative explanations, and reasons for caution.\n\n### 1. Correlation Is Not Causation, and the Timing Argument Is Weaker Than It Looks\n\nMultiple bad things happened to teenagers around 2012\u00e2\u20ac\u201c2015. The Great Recession's aftershocks, rising academic pressure and college competition, political polarization, increased awareness of climate change, and economic anxiety all intensified during this period. The timing overlap with smartphone adoption does not rule these out.\n\nMore critically: the increase in reported mental health problems may partly reflect *increased measurement and help-seeking*, not an actual increase in underlying distress. As mental health awareness grew (partly through social media itself), teens became more likely to identify and report symptoms, clinicians became more likely to diagnose, and surveys became more likely to capture what was previously invisible. A rise in survey-reported depression and anxiety is ambiguous evidence about actual population-level distress.\n\n### 2. The Academic Literature Is More Contested Than Popular Accounts Suggest\n\nJean Twenge's work, while influential, has been substantially challenged by quantitative methodologists. A landmark 2019 analysis by Andrew Przybylski and Amy Orben (published in *Nature Human Behaviour*) used the same large datasets Twenge relied on and found that the effect size of social media use on adolescent well-being was approximately 0.05 \u00e2\u20ac\u201d roughly equivalent to the effect of wearing glasses or eating potatoes. They used specification curve analysis to show that depending on which researcher degrees of freedom are exercised (which variables to control for, which outcomes to use, which populations to include), one can find results ranging from strongly negative to slightly positive.\n\nThe effect sizes in the literature are typically small, inconsistent across studies, and sensitive to methodological choices. Many studies find no significant effect, or find effects only for specific sub-groups, specific platforms, or specific types of use (passive vs. active, comparison-focused vs. communication-focused).\n\nA 2022 pre-registered study by Orben, Przybylski, and colleagues specifically testing the \"Great Rewiring\" hypothesis found minimal evidence that social media use explained the rise in teen mental health problems at the population level.\n\n### 3. Reverse Causality Is a Serious Problem\n\nTeens who are already anxious, depressed, or socially withdrawn may *turn to* social media more heavily as a coping mechanism or because they have fewer offline social options. This reverse causality \u00e2\u20ac\u201d bad mental health driving heavy social media use, rather than the reverse \u00e2\u20ac\u201d is very difficult to rule out in observational studies and would produce exactly the correlations the \"social media causes harm\" narrative predicts, even if the direction were opposite.\n\nLongitudinal studies attempt to address this by controlling for baseline mental health, but the adjustment is imperfect, and reverse causality remains a live methodological concern.\n\n### 4. Some Evidence Suggests Social Media Can Be Protective\n\nFor LGBTQ+ teenagers \u00e2\u20ac\u201d who may be isolated, bullied, or lack supportive peer communities in their offline environments \u00e2\u20ac\u201d social media provides access to identity-affirming communities, peer support, and models of healthy adult lives. Removing or restricting social media access for these teens could be actively harmful.\n\nFor teens with social anxiety, online communication may provide a lower-stakes environment for developing social skills. For teens in geographically isolated areas, online communities may be their primary access to peers with shared interests. A blanket \"social media harms teen mental health\" claim fails to account for these heterogeneous effects.\n\n### 5. The International Comparison Problem\n\nIf smartphone and social media adoption is driving the crisis, the crisis should appear in countries with similar adoption rates. The evidence here is mixed. Some Scandinavian countries with high smartphone use show smaller or different patterns of teen mental health deterioration. Some researchers argue the US trends are partly driven by US-specific factors \u00e2\u20ac\u201d healthcare access, gun violence anxiety, economic insecurity \u00e2\u20ac\u201d and that the cross-national generalizability of Twenge's findings is overstated.\n\n### 6. Publication Bias and the Media-Research Feedback Loop\n\nStudies finding significant negative effects of social media on teens are more likely to be published, more likely to be covered by journalists, and more likely to drive funding for further research. This creates a feedback loop where the literature appears more consistent than it is. Null results and positive findings receive less attention. The cultural panic around social media and teens is itself a strong prior that shapes how researchers frame questions, which outcomes they measure, and which results they publicize.\n\n### 7. The Intervention Evidence Is Weaker Than Claimed\n\nThe Hunt et al. (2018) experimental study cited by the steelman is frequently presented as proof that reducing social media use improves mental health. But the study had significant limitations: 143 participants, self-reported outcomes, short duration (three weeks), and the effects \u00e2\u20ac\u201d while statistically significant \u00e2\u20ac\u201d were modest. More recent, larger experimental studies have shown smaller or inconsistent effects. A 2023 large-scale study of a social media deactivation intervention during the 2020 US election found minimal effects on most well-being outcomes.\n\nThe dose-response pattern could also reflect reverse causality: teens who feel worse spend more time on social media, producing an apparent dose-response relationship that is driven by pre-existing mental health, not exposure.\n\n### 8. Moral Panic Has a History\n\nConcerns about new media harming youth are not new. Television, video games, comic books, and novels were all, at various times, blamed for causing juvenile delinquency, mental illness, and moral corruption in young people. In nearly every prior case, the predicted catastrophic effects failed to materialize or were far smaller than feared, and the moral panic subsided as the next new medium appeared. There are genuine reasons to believe social media is different from previous technologies \u00e2\u20ac\u201d always-on, identity-focused, algorithmically optimized \u00e2\u20ac\u201d but intellectual honesty requires acknowledging this historical pattern of overestimating media harms to youth.\n\n### 9. The Counterfactual Is Unclear\n\nEven if social media use is associated with worse mental health outcomes on average, the relevant policy question is: worse compared to what? If social media use displaces time teens would otherwise spend on television (also associated with negative mental health outcomes), or on sedentary indoor activities, or on social isolation, the counterfactual matters enormously. The claim that social media has made teens worse off requires a credible comparison to what teen life would look like absent social media \u00e2\u20ac\u201d a counterfactual that is essentially impossible to establish empirically.\n\n---\n\n## Synthesis: Where Does the Evidence Land?\n\nThe honest answer sits in genuine uncertainty. The steelman presents real evidence of real harm \u00e2\u20ac\u201d plausible mechanisms, a striking timing correlation, dose-response patterns, gender asymmetry consistent with proposed mechanisms, and damning internal industry evidence. The red team reveals that the effect sizes are contested, the causal direction is uncertain, the heterogeneity of effects is large, and the methodological challenges are severe.\n\nThe most defensible position is probably: social media likely contributes to worse mental health outcomes for a subset of vulnerable teens (particularly adolescent girls prone to social comparison, teens targeted by cyberbullying, and heavy passive users on appearance-focused platforms), but the claim that it has made teenage mental health \"significantly worse\" at the population level is not established with the confidence that popular media accounts and some researchers suggest.\n\nThe appropriate response to this uncertainty is neither denial nor panic. It involves ongoing research with better methods (longitudinal, experimental, pre-registered), platform transparency and design changes that reduce the most harmful features (algorithmic amplification of distress content, infinite scroll, like counts), and targeted interventions for high-risk groups \u00e2\u20ac\u201d rather than blunt restrictions that would remove documented benefits for vulnerable teens who rely on social media for community and support.\n"}], "grading": null}, {"id": "eval-3-with_skill", "prompt": "I want you to steelman and red team this: companies should eliminate annual performance reviews and replace them with continuous feedback only", "eval_id": 3, "outputs": [{"name": "response.md", "type": "text", "content": "## Steelman: Companies should eliminate annual performance reviews and replace them with continuous feedback only\n\nThe annual performance review is a relic of mid-20th century bureaucratic management \u00e2\u20ac\u201d a single high-stakes ritual that compresses a year of complex human work into a numeric score and a 45-minute conversation. The strongest case for abolishing it runs as follows:\n\nAnnual reviews are structurally incompatible with how humans learn and improve. Feedback loses most of its instructional value when delayed by months. A software engineer who shipped a poorly architected module in February learns nothing useful from hearing about it the following December; the context is gone, the habits have calcified, and the conversation becomes archaeological rather than developmental. Continuous feedback, by contrast, delivers correction and encouragement at the moment of maximum relevance \u00e2\u20ac\u201d immediately after behavior occurs, when the recipient can act on it.\n\nThe annual format also systematically distorts perception. Recency bias dominates: managers disproportionately weight the last 60 days when scoring a full year, meaning an employee's rating reflects the accident of timing more than actual performance. Continuous feedback distributed across the year averages out these distortions and creates a more accurate composite picture.\n\nAnnual reviews concentrate anxiety and gaming behavior into a discrete event. Employees manage up, avoid risky projects in Q4, and optimize for the optics of the review rather than the substance of their work. Continuous feedback decouples recognition from a single high-stakes audit, reducing perverse incentives and the psychological load of a once-a-year judgment on one's worth.\n\nThere is also strong organizational evidence. Adobe eliminated annual reviews in 2012 and saw voluntary attrition drop 30% in the years following. Deloitte, GE, and Accenture followed. The shift to continuous feedback systems \u00e2\u20ac\u201d check-ins, project retrospectives, real-time recognition platforms \u00e2\u20ac\u201d correlates with higher engagement scores, faster skill development, and better manager-employee relationships across multiple large-sample studies.\n\nFinally, continuous feedback aligns with modern work rhythms. In a world of two-week sprints, quarterly product launches, and remote-distributed teams, the annual review cycle is simply too slow. Feedback infrastructure needs the same cadence as the work itself.\n\n---\n\n## Red Team: Against the Steelman\n\nThe steelman's strongest moves are its empirical claims and the learning-theory argument. But both contain significant vulnerabilities.\n\nThe Adobe/GE evidence is often cited but poorly controlled. These companies did not run randomized trials; they made the change alongside other major cultural and structural shifts. Adobe also simultaneously overhauled its compensation architecture. Attributing the 30% attrition drop to eliminating annual reviews rather than the full constellation of changes is selection bias dressed as causation. Companies that publicly announce progressive management reforms also tend to attract different talent pools \u00e2\u20ac\u201d the effect may be signaling, not mechanism.\n\nMore fundamentally, the steelman conflates \"annual reviews are bad\" with \"continuous feedback alone is sufficient.\" These are different claims. The real question is whether continuous feedback can perform all the functions that annual reviews \u00e2\u20ac\u201d however imperfectly \u00e2\u20ac\u201d currently serve:\n\n**Compensation calibration**: Most companies use annual reviews to anchor pay decisions across teams and business units. Continuous feedback is qualitative and relationship-mediated; it lacks the structured cross-comparability that salary bands and promotion frameworks require. Without a periodic structured assessment, compensation decisions default to manager advocacy, which demonstrably amplifies existing biases (gender, race, likeability) rather than reducing them.\n\n**Documentation and legal defensibility**: Annual reviews create a paper trail that HR and legal teams rely on for performance improvement plans, termination decisions, and discrimination litigation. Continuous feedback \u00e2\u20ac\u201d especially when informal and unrecorded \u00e2\u20ac\u201d leaves organizations legally exposed and employees without any formal record of their standing.\n\n**Goal-setting and strategic alignment**: Effective performance management requires tying individual work to organizational objectives over a meaningful time horizon. Continuous feedback tends toward the tactical and interpersonal; it rarely forces the question \"what should this person be working toward over the next 12 months and how does that connect to where the company is going?\"\n\nThe learning-theory argument \u00e2\u20ac\u201d that immediate feedback is always better \u00e2\u20ac\u201d is also weaker than it sounds. Some forms of learning require distance and reflection. A manager who delivers feedback immediately after every difficult conversation may actually inhibit metacognitive development; there's evidence that spaced, synthesized feedback on patterns (rather than individual incidents) produces deeper behavior change. Continuous feedback can create feedback fatigue and noise, making it harder for employees to identify the signal about what actually matters.\n\n---\n\n## Steelman: Annual performance reviews should be retained (possibly reformed, but not eliminated)\n\nThe case for keeping structured annual reviews is not nostalgia \u00e2\u20ac\u201d it is a recognition that some organizational problems require periodic, formalized resolution and that informal continuous feedback cannot reliably substitute.\n\nAnnual reviews serve as a forcing function for systematic reflection that does not happen organically. Left to their own devices, managers and employees alike default to the urgent over the important. Continuous feedback systems, however well-designed, respond to salient events \u00e2\u20ac\u201d the recent launch, the visible mistake, the interpersonal friction. Annual reviews compel a slower, more deliberate synthesis: Where was this person twelve months ago? Where are they now? What patterns characterize their work that no single incident captures?\n\nThis deliberate synthesis is what connects to career development in a meaningful way. An employee's trajectory \u00e2\u20ac\u201d their developing strengths, their persistent blind spots, their readiness for greater responsibility \u00e2\u20ac\u201d is a long-horizon signal that emerges from accumulated data. Annual reviews are the institution that forces organizations to process that long-horizon signal explicitly rather than letting it drift.\n\nStructured annual reviews also create organizational equity. Continuous feedback is unevenly distributed: employees with extroverted personalities, strong manager relationships, and high visibility receive more of it and higher-quality feedback. Quieter contributors, remote workers, and employees whose work is less visible get less. A mandatory annual process creates a floor \u00e2\u20ac\u201d every employee gets at least one structured, documented assessment per year, regardless of how much informal attention they receive.\n\nThe compensation and calibration function is not a bug to be engineered around; it is a genuine organizational need. Companies need to make decisions about who gets promoted, what salary bands are appropriate, and how to allocate development resources across a population. These decisions require a common framework and a moment of cross-organizational comparison. Continuous feedback, being distributed and qualitative, cannot generate the structured comparability that equitable resource allocation requires. Removing the annual review without replacing its calibration function simply pushes that calibration into informal back-channels where bias operates unchecked.\n\nFinally, many employees actively value the annual review as a moment of formal recognition and a structured conversation about their future. The research on employee engagement consistently finds that workers want to know where they stand, where they're going, and whether the organization sees and values their contribution. Done well, an annual review provides precisely this \u00e2\u20ac\u201d a formalized declaration of standing and trajectory that carries weight precisely because it is deliberate and documented.\n\n---\n\n## Red Team: Against the Counter-Claim's Steelman\n\nThe counter-claim's most durable arguments are the calibration/equity case and the long-horizon synthesis argument. But they contain their own problems.\n\nThe equity argument \u00e2\u20ac\u201d that annual reviews create a floor of structured attention \u00e2\u20ac\u201d assumes that the mandated annual review actually functions as advertised. The evidence suggests it often does not. Annual review processes notoriously vary in quality, investment, and rigor across managers. A poorly motivated manager will write three boilerplate sentences in December and check the box. If the \"floor\" is a perfunctory once-a-year formality, it provides little equity benefit while consuming significant organizational resources and creating false assurance that structured development is happening. The argument for annual reviews depends heavily on the quality of implementation \u00e2\u20ac\u201d which is precisely what is contested.\n\nThe compensation calibration argument is also more separable than the counter-claim implies. Calibration sessions and compensation committees can exist independently of individual employee reviews. Many organizations conduct top-down calibration across employee populations without necessarily anchoring it to a 360-degree feedback document completed by each employee. The functions can be disaggregated: keep cross-team calibration rituals, eliminate the individual review as the primary feedback mechanism.\n\nThe long-horizon synthesis argument has merit, but it doesn't require the current format. A quarterly structured check-in that asks \"pattern\" questions \u00e2\u20ac\u201d not just \"what happened this sprint\" but \"what's developing over time\" \u00e2\u20ac\u201d can capture long-horizon signal without compressing it into an annual event. The synthesis function is real; the annual frequency is not the only way to achieve it.\n\nThe claim that annual reviews serve as formal recognition that employees value is complicated by the data on how employees actually experience them. Surveys consistently show that the majority of employees find annual reviews stressful, unfair, or demotivating. The minority who find them valuable tend to be high performers who receive positive ratings \u00e2\u20ac\u201d those are the employees least at risk of the problems reviews are meant to address. Designing the system around the experience of people who already benefit from it is not a compelling equity argument.\n\n---\n\n## Synthesis\n\n**What survived red-teaming:**\n\nFrom the pro-abolition side: the feedback-delay problem is real and well-grounded in learning theory. The recency bias and gaming problems are empirically robust. The claim that continuous feedback better matches modern work cadences is solid.\n\nFrom the pro-retention side: the calibration and compensation function is real and not easily replaced by continuous feedback. The long-horizon synthesis function is real. The legal documentation function is real and often underweighted in popular management literature.\n\n**What converges:**\n\nBoth steelmans implicitly agree that the *current* annual review, as typically implemented, is ineffective. The pro-retention argument does not defend the existing ritual \u00e2\u20ac\u201d it defends the functions that ritual is meant to serve. Both sides also agree that feedback quality and manager capability are the binding constraints: a bad continuous feedback system is worse than a good annual review, and vice versa.\n\n**What genuinely contradicts:**\n\nThe equity argument cuts both ways without resolution. The pro-abolition side says continuous feedback is more responsive and reduces the high-stakes anxiety of a single annual judgment. The pro-retention side says continuous feedback is unevenly distributed and a mandated annual process creates a floor. These are genuinely empirical disagreements about how feedback systems actually operate in organizations, and the answer likely varies by company size, culture, and manager quality.\n\n**The reasoning chain:**\n\nThe abolition argument is strongest on the pedagogical and motivational dimensions \u00e2\u20ac\u201d feedback timing, recency bias, perverse incentives. The retention argument is strongest on the structural and administrative dimensions \u00e2\u20ac\u201d compensation calibration, legal documentation, equity floors. Neither side's strongest arguments directly rebut the other's strongest arguments; they are largely talking past each other because they are optimizing for different outcomes.\n\n**Final verdict:**\n\nThe claim as stated \u00e2\u20ac\u201d eliminate annual reviews and replace with *continuous feedback only* \u00e2\u20ac\u201d is too strong. The word \"only\" is where it breaks down. Continuous feedback systems are clearly superior to annual reviews as the primary mechanism for learning, development, and day-to-day performance management. But organizations still need periodic structured moments for calibration, documentation, career trajectory synthesis, and formal compensation anchoring. The evidence from companies like Adobe and Deloitte shows these functions can be served by lighter-weight, more frequent structured check-ins (quarterly conversations, project retrospectives, explicit career development discussions) rather than the traditional annual review format.\n\nThe actionable verdict: abolish the *annual review as the primary feedback mechanism*, replace it with continuous feedback, and preserve *periodic structured check-ins* (quarterly or semi-annually) that serve the calibration, documentation, and long-horizon synthesis functions the annual review was doing. \"Continuous feedback only\" overstates the case; \"continuous feedback plus lighter structured touchpoints\" is what the evidence actually supports.\n"}], "grading": null}, {"id": "eval-3-without_skill", "prompt": "I want you to steelman and red team this: companies should eliminate annual performance reviews and replace them with continuous feedback only", "eval_id": 3, "outputs": [{"name": "response.md", "type": "text", "content": "# Steelman and Red Team: Eliminate Annual Performance Reviews, Replace with Continuous Feedback Only\n\n---\n\n## The Proposition\n\n> Companies should eliminate annual performance reviews and replace them with continuous feedback only.\n\n---\n\n## Part 1: The Steelman \u00e2\u20ac\u201d The Best Case FOR This Change\n\n### 1. Annual Reviews Are Structurally Broken by Design\n\nThe annual performance review was designed for a slower, more industrial era. In modern knowledge work, a year is an eternity. Projects launch and conclude in weeks. Teams form, dissolve, and re-form. Skills become obsolete. Waiting 12 months to tell someone their work was subpar is not just ineffective \u00e2\u20ac\u201d it is actively harmful. The feedback arrives long after the employee could have corrected course, and often long after the damage is done.\n\nResearch by psychologists on the \"recency bias\" demonstrates that managers systematically over-weight the last 60-90 days of performance when rating an entire year. This means annual reviews are not actually annual \u00e2\u20ac\u201d they are quarterly reviews with extra paperwork and inflated stakes.\n\n### 2. Continuous Feedback Mirrors How High-Performance Actually Works\n\nElite athletes do not wait for an annual debrief to learn what went wrong. They get real-time coaching after every rep, every game, every race. Software engineers doing agile development get feedback in sprint retrospectives every two weeks. The highest-performing teams in the world operate on tight, frequent feedback loops because that is what learning requires.\n\nContinuous feedback aligns the organization with how humans actually improve: through immediate, specific, actionable input that can be applied right away.\n\n### 3. Annual Reviews Create Perverse Incentives\n\nThe annual review cycle distorts behavior. Employees \"save up\" accomplishments for review season. Managers game ratings to preserve team morale or budget allocations. Forced ranking systems pit colleagues against each other. The anticipation of the review creates anxiety that depresses productivity in the weeks leading up to it. The review itself consumes enormous organizational resources \u00e2\u20ac\u201d estimates place the cost of performance review cycles at organizations like Deloitte at over 2 million hours per year company-wide.\n\nContinuous feedback eliminates the artificial \"grade point average\" dynamic and replaces it with an ongoing professional development conversation.\n\n### 4. The Power Dynamic Problem\n\nAnnual reviews concentrate enormous power in a single manager-employee interaction. One bad conversation, one biased manager, one off day \u00e2\u20ac\u201d and a year of work is defined. Studies show persistent racial, gender, and age bias in annual performance ratings. Continuous feedback distributes the assessment function across time and potentially across multiple observers, making the process more robust against any single biased actor.\n\n### 5. Major Companies Have Already Made This Work\n\nAdobe eliminated annual reviews in 2012 and reported a dramatic reduction in voluntary turnover (estimated at saving $80M+ annually). Deloitte, Accenture, GE, and Microsoft all moved away from traditional annual review systems. These are not fringe experiments \u00e2\u20ac\u201d they are proof-of-concept at scale from some of the world's largest employers.\n\n### 6. Continuous Feedback Enables Psychological Safety\n\nAnnual reviews \u00e2\u20ac\u201d especially those tied to ratings and forced distributions \u00e2\u20ac\u201d are fundamentally evaluative and threatening. They activate the brain's threat response, which shuts down the openness to learning. Continuous feedback, when done well, is developmental rather than judgmental. It builds a culture where learning from mistakes is normalized rather than penalized at year-end.\n\n### 7. It Closes the Gap Between Compensation and Reality\n\nUnder annual review systems, compensation adjustments lag reality by up to 18 months (review \u00e2\u2020\u2019 budget cycle \u00e2\u2020\u2019 next raise). Employees who take on dramatically more responsibility see no financial recognition until the next review period. Continuous systems enable faster, more accurate compensation alignment with actual contribution.\n\n---\n\n## Part 2: The Red Team \u00e2\u20ac\u201d The Strongest Case AGAINST This Change\n\n### 1. \"Continuous Feedback\" Is Not a System \u00e2\u20ac\u201d It Is a Hope\n\nThe most damning critique of eliminating annual reviews is that companies rarely replace them with an equally structured alternative. \"Continuous feedback\" in practice often means no feedback. It means that busy managers, who were already reluctant to give feedback at annual review time, now have no forcing function at all. The calendar discipline of annual reviews \u00e2\u20ac\u201d however imperfect \u00e2\u20ac\u201d guarantees that employees receive *at least one* formal, documented evaluation per year. Remove that structure and many employees will go years without substantive performance input.\n\nThe research supports this concern. After Adobe eliminated reviews, many managers defaulted to avoiding difficult conversations entirely, which ultimately created its own set of problems.\n\n### 2. Annual Reviews Serve Multiple Functions That Are Hard to Unbundle\n\nAnnual performance reviews are not only about feedback. They serve as:\n- **Legal documentation** of performance issues before termination\n- **Compensation calibration** across large organizations\n- **Promotion decisions** that require consistent, comparable data\n- **Equity checks** \u00e2\u20ac\u201d forcing comparison of how different demographic groups are rated\n- **Succession planning** \u00e2\u20ac\u201d identifying high-potential employees systematically\n\nContinuous feedback is excellent for development but handles these functions poorly. Without a periodic structured touchpoint, how does HR ensure pay equity? How does legal establish documented cause for termination? How does leadership identify the top 10% of performers organization-wide? These are not trivial problems.\n\n### 3. Manager Quality Variance Makes Continuous Systems Dangerous\n\nContinuous feedback systems work brilliantly when managers are skilled, emotionally intelligent communicators. Most managers are not. The annual review, for all its flaws, provides structure that compensates for managerial deficiencies. It forces a manager who would otherwise avoid hard conversations to have them on a schedule, and it often routes that conversation through HR templates that add some procedural fairness.\n\nContinuous feedback without the annual structure amplifies manager variance: great managers get even better, while poor managers disappear into silence. The employees most in need of feedback \u00e2\u20ac\u201d those working for avoidant, conflict-averse, or biased managers \u00e2\u20ac\u201d lose the one guaranteed intervention in their year.\n\n### 4. \"Continuous\" Does Not Mean \"Documented\"\n\nLegal and HR departments should be deeply alarmed by the elimination of structured annual reviews. When a manager needs to terminate an underperforming employee, the annual review record is often the primary documentary evidence. Continuous verbal feedback leaves no paper trail. Companies that eliminate structured reviews without implementing rigorous documentation alternatives expose themselves to wrongful termination litigation and create perverse incentives to avoid any feedback that might later become exculpatory evidence.\n\n### 5. Cognitive Overhead and Feedback Fatigue Are Real\n\nThe vision of continuous feedback imagines a world of constant, high-quality developmental conversations. The reality of continuous feedback systems (Slack nudges, weekly 1:1s, pulse surveys, 360-degree platforms) is that they generate enormous cognitive overhead. Employees and managers are already overwhelmed with communication. Adding more feedback channels increases noise. There is a real risk that \"more feedback\" means \"less signal\" \u00e2\u20ac\u201d that important messages get lost in a stream of minor observations and platform notifications.\n\n### 6. Fairness Requires Comparable Baselines\n\nAnnual reviews, for all their flaws, create a shared reference point. Everyone is assessed against the same rubric at the same time of year, which enables cross-calibration. Managers can compare notes: \"Is everyone on my team getting 'exceeds expectations,' or am I grade-inflating?\" Continuous systems are inherently more idiosyncratic \u00e2\u20ac\u201d one employee gets intense developmental coaching while another hears nothing. This makes it harder to identify and correct systemic bias, harder to ensure pay equity, and harder to build a shared organizational vocabulary around performance.\n\n### 7. The Companies That \"Succeeded\" Mostly Didn't Go to Pure Continuous Feedback\n\nA critical look at the case studies reveals a sleight of hand. Adobe, Deloitte, and Accenture did not eliminate structured periodic reviews \u00e2\u20ac\u201d they replaced annual reviews with more frequent structured reviews (quarterly or semi-annual check-ins). They eliminated \"ratings\" and \"forced distributions,\" not the concept of structured, documented, periodic assessment. Conflating \"eliminate annual ratings\" with \"replace with continuous feedback only\" misrepresents what these companies actually did. True continuous-feedback-only implementations are far rarer and less validated.\n\n### 8. Some Employees Need and Deserve Annual Summaries\n\nHigh-performing employees benefit from an annual narrative of their growth, a \"case file\" they can reference for salary negotiations, internal transfers, or external job searches. Continuous feedback is ephemeral \u00e2\u20ac\u201d a comment in a Slack channel, a note in a 1:1 doc \u00e2\u20ac\u201d and rarely assembles into a coherent story. Annual reviews, when done well, provide employees with a document they can own, reference, and share. Eliminating them removes a tool that primarily benefits employees, not employers.\n\n---\n\n## Part 3: The Synthesis \u00e2\u20ac\u201d What Both Sides Get Right\n\nThe sharpest version of this debate is not \"annual reviews vs. continuous feedback\" \u00e2\u20ac\u201d it is about whether organizations can build the manager capability and systems infrastructure to make continuous feedback actually continuous, documented, and fair.\n\nThe steelman is correct that annual reviews as typically practiced are badly broken and that the psychological and behavioral research supports frequent, specific feedback over infrequent summary judgment.\n\nThe red team is correct that eliminating annual reviews without replacing the documentation, equity-checking, and compensation-calibration functions they serve is not a reform \u00e2\u20ac\u201d it is an abdication.\n\nThe most defensible position is a hybrid: eliminate annual *ratings* and *forced distributions*, but retain semi-annual or annual *structured touchpoints* that document development, enable cross-calibration, support legal compliance, and integrate with compensation. Layer continuous feedback on top of \u00e2\u20ac\u201d not instead of \u00e2\u20ac\u201d that structural foundation.\n\nThe proposition as stated (\"replace with continuous feedback *only*\") overclaims. The word \"only\" is where it breaks down.\n\n---\n\n*Analysis generated 2026-04-01*\n"}], "grading": null}], "previous_feedback": {}, "previous_outputs": {}, "benchmark": {"metadata": {"skill_name": "steelman-redteam", "skill_path": "<path/to/skill>", "executor_model": "<model-name>", "analyzer_model": "<model-name>", "timestamp": "2026-04-02T06:07:02Z", "evals_run": [1, 2, 3], "runs_per_configuration": 3}, "runs": [{"eval_id": 1, "configuration": "with_skill", "run_number": 1, "result": {"pass_rate": 1.0, "passed": 5, "failed": 0, "total": 5, "time_seconds": 187.5, "tokens": 19339, "tool_calls": 0, "errors": 0}, "expectations": [{"text": "has-four-sections: Output has all four argument sections (steelman of claim, red-team of steelman, steelman of counter-claim, red-team of counter-claim's steelman) plus a synthesis section", "passed": true, "evidence": "All five sections are present with clear headings: '## Steelman: Raising the federal minimum wage to $25/hour would be net positive for low-income workers', '## Red Team: Against the Steelman', '## Steelman: A $25 federal minimum wage would be net negative for low-income workers', '## Red Team: Against the Counter-Claim\u2019s Steelman', and '## Synthesis'."}, {"text": "steelmans-cite-evidence: Both steelman sections contain specific empirical evidence, economic reasoning, or concrete examples \u2014 not just vague assertions", "passed": true, "evidence": "Steelman 1 cites: 'The federal minimum wage of $7.25/hour has lost roughly 40% of its real value since 1968', 'The Seattle Minimum Wage Study (Dube et al.)', 'California and New York City have implemented wages well above $15 with no observable employment catastrophe', and '33 million workers'. Steelman 2 (counter-claim) cites specific regional examples ('rural Mississippi or West Virginia', 'rural Alabama'), specific worker categories (young, criminal records, limited English), EITC empirical track record, and the fiscal mechanics of transfer programs."}, {"text": "red-teams-find-real-weaknesses: Both red-team sections attack the steelmanned version of each argument (not a weaker version), and identify vulnerabilities that a thoughtful proponent would find genuinely challenging", "passed": true, "evidence": "Red Team 1 directly attacks the steelman's core empirical claims: 'The empirical record supporting minimum wage increases is drawn almost entirely from studies of increases to $10, $12, or $15 \u2014 not $25' and 'fast food and retail operate on 2-5% net margins. Where is the monopsony rent?' \u2014 directly undermining the monopsony argument. Red Team 2 attacks the counter-claim's geographic argument ('proves too much \u2014 it proves that there should be no federal minimum wage'), the productivity-floor argument ('treats productivity as a fixed characteristic'), and the EITC alternative ('The EITC can function as a subsidy to low-wage employers')."}, {"text": "synthesis-gives-verdict: The synthesis section provides a specific conclusion, verdict, or clearly names the unresolved empirical question or value disagreement at the heart of the debate \u2014 not just 'it depends' without explanation", "passed": true, "evidence": "'The claim as stated \u2014 that a $25 federal minimum wage would be net positive for low-income workers \u2014 is probably false, and the falseness is not close-call. The key failure is the \u201cfederal\u201d framing combined with the $25 number.' The synthesis also names the unresolved empirical question: 'does the labor market evidence from moderate increases ($10\u2013$15) extend to a $25 federal floor?'"}, {"text": "synthesis-explains-reasoning-chain: The synthesis explains how the four preceding arguments (what survived, what was damaged, what converged or contradicted) led to its conclusion", "passed": true, "evidence": "The synthesis contains explicit subsections 'What survived red-teaming', 'What converges', 'What genuinely contradicts', and 'The reasoning chain' with four numbered points tracing each section's contribution: '1. The steelman is strong on the mechanism...It weakens significantly on the $25 threshold specifically and on geographic heterogeneity. 2. The red team on the steelman lands hardest on magnitude extrapolation... 3. The counter-claim steelman is strongest on the geographic mismatch... 4. The red team on the counter-claim partially rehabilitates the steelman...But it does not overcome the geographic heterogeneity problem.'"}], "notes": []}, {"eval_id": 2, "configuration": "with_skill", "run_number": 1, "result": {"pass_rate": 1.0, "passed": 4, "failed": 0, "total": 4, "time_seconds": 182.8, "tokens": 19176, "tool_calls": 0, "errors": 0}, "expectations": [{"text": "has-four-sections: The response has clearly delineated steelman of the claim, red-team of that steelman, steelman of the counter-claim, red-team of the counter-claim, and synthesis \u00e2\u20ac\u201d all five sections present", "passed": true, "evidence": "The response contains all five clearly labeled sections separated by horizontal rules: '## Steelman: Social media has made teenage mental health significantly worse', '## Red Team: Against the Steelman', '## Steelman: Social media has not made teenage mental health significantly worse', '## Red Team: Against the Counter-Claim's Steelman', and '## Synthesis'."}, {"text": "counter-claim-is-positive-case: The counter-claim steelman makes a positive, affirmative case for why social media hasn't significantly worsened teen mental health (or why other factors are more responsible) \u00e2\u20ac\u201d it's not just 'the original claim is wrong' but a substantive alternative view", "passed": true, "evidence": "The counter-claim steelman affirmatively argues: 'The effect sizes, when measured carefully, are small. Orben and Przybylski's 2019 analysis in Nature Human Behaviour...found that social media use explained roughly 0.4% of the variance in adolescent wellbeing.' It also makes positive cases for alternative explanations: 'Academic pressure has intensified...Economic insecurity post-2008 has materially changed what teenagers expect their futures to look like. The erosion of unstructured time, physical activity, and neighborhood independence has proceeded for decades' and highlights benefits: 'For LGBTQ+ teenagers in non-affirming environments, social media provides access to community, identity development resources, and peer connection that would otherwise be unavailable.'"}, {"text": "references-research: The analysis references specific researchers, studies, or bodies of evidence relevant to teen mental health and social media (e.g., Haidt, Twenge, or critics like Orben/Przybylski)", "passed": true, "evidence": "The response references: Jean Twenge's 'longitudinal work' and 'Jonathan Haidt and Jean Twenge's co-authored analyses' (steelman section); 'Amy Orben, Andrew Przybylski' who 'conducted pre-registered analyses on the same large datasets Twenge uses' (red team section); 'Orben and Przybylski's 2019 analysis in Nature Human Behaviour' (counter-claim steelman); 'Sonia Livingstone's research on UK adolescents' (counter-claim steelman); and 'The internal documents leaked from Meta in 2021' (steelman section)."}, {"text": "synthesis-handles-contradiction: If the four arguments point in genuinely contradictory directions, the synthesis explicitly acknowledges the contradiction rather than papering over it", "passed": true, "evidence": "'What genuinely contradicts? The core dispute is empirical and unresolved: are the small population-average effect sizes evidence that social media's contribution is minor, or are they consistent with large harms concentrated in vulnerable subgroups that get diluted in aggregate analysis? This is a genuine methodological disagreement between careful researchers who have looked at the same data. It cannot be resolved by argument \u00e2\u20ac\u201d it requires better study designs (randomized experiments, longer longitudinal follow-up, richer outcome measurement).'"}], "notes": []}, {"eval_id": 3, "configuration": "with_skill", "run_number": 1, "result": {"pass_rate": 1.0, "passed": 3, "failed": 0, "total": 3, "time_seconds": 162.3, "tokens": 18443, "tool_calls": 0, "errors": 0}, "expectations": [{"text": "has-four-sections: The response has clearly structured steelman of the claim, red-team of that steelman, steelman of the counter-claim, red-team of the counter-claim, and synthesis \u00e2\u20ac\u201d all five sections present", "passed": true, "evidence": "The response contains five clearly headed sections: '## Steelman: Companies should eliminate annual performance reviews and replace them with continuous feedback only', '## Red Team: Against the Steelman', '## Steelman: Annual performance reviews should be retained (possibly reformed, but not eliminated)', '## Red Team: Against the Counter-Claim\u2019s Steelman', and '## Synthesis'. All five are present and clearly delineated."}, {"text": "steelmans-are-genuinely-strong: Both steelman sections represent the strongest reasonable case for their position \u00e2\u20ac\u201d someone who holds that view would recognize it as a fair and compelling presentation, not a weakened version", "passed": true, "evidence": "The pro-abolition steelman deploys learning-theory arguments ('Feedback loses most of its instructional value when delayed by months'), concrete corporate evidence ('Adobe eliminated annual reviews in 2012 and saw voluntary attrition drop 30%'), and behavioral economics ('recency bias dominates'). The pro-retention steelman makes the equity floor argument ('A mandatory annual process creates a floor \u00e2\u20ac\u201d every employee gets at least one structured, documented assessment per year'), the calibration argument ('Companies need to make decisions about who gets promoted, what salary bands are appropriate'), and a career-trajectory synthesis argument ('An employee\u2019s trajectory... is a long-horizon signal that emerges from accumulated data'). Both are substantive, evidence-grounded, and would be recognizable to genuine advocates of each position."}, {"text": "synthesis-gives-actionable-conclusion: The synthesis gives a conclusion that would be genuinely useful to a business leader deciding on performance review policy \u00e2\u20ac\u201d either a clear recommendation, a clear identification of when each approach is better, or a precise naming of the values/empirical question that drives the disagreement", "passed": true, "evidence": "The synthesis delivers a direct recommendation: 'The actionable verdict: abolish the annual review as the primary feedback mechanism, replace it with continuous feedback, and preserve periodic structured check-ins (quarterly or semi-annually) that serve the calibration, documentation, and long-horizon synthesis functions the annual review was doing. \u201cContinuous feedback only\u201d overstates the case; \u201ccontinuous feedback plus lighter structured touchpoints\u201d is what the evidence actually supports.' It also precisely names the empirical disagreement driving residual uncertainty: 'These are genuinely empirical disagreements about how feedback systems actually operate in organizations, and the answer likely varies by company size, culture, and manager quality.'"}], "notes": []}, {"eval_id": 1, "configuration": "without_skill", "run_number": 1, "result": {"pass_rate": 0.2, "passed": 1, "failed": 4, "total": 5, "time_seconds": 154.2, "tokens": 16723, "tool_calls": 0, "errors": 0}, "expectations": [{"text": "has-four-sections: Output has all four argument sections (steelman of claim, red-team of steelman, steelman of counter-claim, red-team of counter-claim's steelman) plus a synthesis section", "passed": false, "evidence": "The output contains only two argument sections \u00e2\u20ac\u201d 'STEELMAN: The Strongest Case FOR' and 'RED TEAM: The Strongest Case AGAINST' \u00e2\u20ac\u201d followed by a 'Summary'. There is no 'steelman of counter-claim' (the strongest case against raising the minimum wage to $25) and no 'red-team of counter-claim's steelman'. The required four-section dialectical structure is absent; the output follows a conventional two-sided debate format instead."}, {"text": "steelmans-cite-evidence: Both steelman sections contain specific empirical evidence, economic reasoning, or concrete examples \u00e2\u20ac\u201d not just vague assertions", "passed": false, "evidence": "Only one steelman section exists. That section is evidence-rich \u00e2\u20ac\u201d it cites the CBO 2021 analysis, economists Dube/Reich/Zipperer, Seattle/San Francisco/New York city-level examples, monopsony literature, and SNAP/Medicaid spending estimates. However, because there is no steelman of the counter-claim, the assertion that 'both steelman sections' contain empirical evidence cannot be satisfied. The single steelman section would pass on its own merits."}, {"text": "red-teams-find-real-weaknesses: Both red-team sections attack the steelmanned version of each argument (not a weaker version), and identify vulnerabilities that a thoughtful proponent would find genuinely challenging", "passed": false, "evidence": "Only one red-team section exists. That section does engage seriously with the steelmanned arguments \u00e2\u20ac\u201d for example, 'The Empirical Literature Does Not Clearly Generalize to $25' directly challenges the Dube/Reich/Zipperer evidence cited in the steelman, and the automation and regional variation points are genuinely challenging. However, because there is no steelman of counter-claim and therefore no red-team of counter-claim's steelman, the assertion that 'both red-team sections' attack steelmanned arguments cannot be satisfied."}, {"text": "synthesis-gives-verdict: The synthesis section provides a specific conclusion, verdict, or clearly names the unresolved empirical question or value disagreement at the heart of the debate \u00e2\u20ac\u201d not just 'it depends' without explanation", "passed": true, "evidence": "The Summary provides a specific, calibrated verdict: 'a $15\u00e2\u20ac\u201c$18 federal minimum with regional adjustment mechanisms has a reasonably strong evidence base behind it. A flat $25 national minimum involves substantially more uncertainty, and the risk that it harms the specific low-income workers it is designed to help is non-trivial rather than dismissible.' This names a concrete threshold and distinguishes evidentially supported from evidentially unsupported policy levels."}, {"text": "synthesis-explains-reasoning-chain: The synthesis explains how the four preceding arguments (what survived, what was damaged, what converged or contradicted) led to its conclusion", "passed": false, "evidence": "The Summary references the steelman and red-team cases ('The steelman case is genuinely strong... The red team case is also genuinely strong') but there are only two preceding argument sections, not four. The synthesis cannot trace a reasoning chain through four arguments that do not exist. The summary is a reasonable synthesis of the two-section structure actually present, but it does not \u00e2\u20ac\u201d and cannot \u00e2\u20ac\u201d explain how four arguments converged or contradicted to produce its conclusion."}], "notes": []}, {"eval_id": 2, "configuration": "without_skill", "run_number": 1, "result": {"pass_rate": 0.5, "passed": 2, "failed": 2, "total": 4, "time_seconds": 167.8, "tokens": 17348, "tool_calls": 0, "errors": 0}, "expectations": [{"text": "has-four-sections: The response has clearly delineated steelman of the claim, red-team of that steelman, steelman of the counter-claim, red-team of the counter-claim, and synthesis \u00e2\u20ac\u201d all five sections present", "passed": false, "evidence": "The response only has three major sections: 'Part 1: The Steelman \u00e2\u20ac\u201d The Strongest Case That Social Media Has Harmed Teen Mental Health', 'Part 2: The Red Team \u00e2\u20ac\u201d The Strongest Challenges to This Claim', and 'Synthesis: Where Does the Evidence Land?'. There is no separate 'steelman of the counter-claim' section and no 'red-team of the counter-claim' section. The assertion requires five distinct sections but only three are present."}, {"text": "counter-claim-is-positive-case: The counter-claim steelman makes a positive, affirmative case for why social media hasn't significantly worsened teen mental health (or why other factors are more responsible) \u00e2\u20ac\u201d it's not just 'the original claim is wrong' but a substantive alternative view", "passed": false, "evidence": "There is no dedicated 'steelman of the counter-claim' section. While the red team section contains some affirmative positive content (e.g., Section 4: 'Some Evidence Suggests Social Media Can Be Protective' \u00e2\u20ac\u201d 'For LGBTQ+ teenagers... social media provides access to identity-affirming communities, peer support, and models of healthy adult lives'), this is embedded within the red team section as one of nine sub-points challenging the original claim, not presented as a standalone affirmative steelman of a counter-claim."}, {"text": "references-research: The analysis references specific researchers, studies, or bodies of evidence relevant to teen mental health and social media (e.g., Haidt, Twenge, or critics like Orben/Przybylski)", "passed": true, "evidence": "The response references multiple specific researchers and studies: Jean Twenge's 'longitudinal research using large national datasets (the Youth Risk Behavior Survey, the Monitoring the Future study)'; 'a landmark 2019 analysis by Andrew Przybylski and Amy Orben (published in Nature Human Behaviour)'; 'Hunt et al. (2018)' experimental study; 'Frances Haugen's disclosure of internal Facebook research'; and 'A 2022 pre-registered study by Orben, Przybylski, and colleagues specifically testing the \"Great Rewiring\" hypothesis'."}, {"text": "synthesis-handles-contradiction: If the four arguments point in genuinely contradictory directions, the synthesis explicitly acknowledges the contradiction rather than papering over it", "passed": true, "evidence": "The synthesis explicitly states: 'The honest answer sits in genuine uncertainty. The steelman presents real evidence of real harm \u00e2\u20ac\u201d plausible mechanisms, a striking timing correlation, dose-response patterns, gender asymmetry consistent with proposed mechanisms, and damning internal industry evidence. The red team reveals that the effect sizes are contested, the causal direction is uncertain, the heterogeneity of effects is large, and the methodological challenges are severe.' The synthesis concludes with a nuanced, uncertainty-acknowledging position rather than papering over the contradictions."}], "notes": []}, {"eval_id": 3, "configuration": "without_skill", "run_number": 1, "result": {"pass_rate": 0.33, "passed": 1, "failed": 2, "total": 3, "time_seconds": 152.8, "tokens": 16457, "tool_calls": 0, "errors": 0}, "expectations": [{"text": "has-four-sections: The response has clearly structured steelman of the claim, red-team of that steelman, steelman of the counter-claim, red-team of the counter-claim, and synthesis \u00e2\u20ac\u201d all five sections present", "passed": false, "evidence": "The response has only three sections: 'Part 1: The Steelman \u00e2\u20ac\u201d The Best Case FOR This Change', 'Part 2: The Red Team \u00e2\u20ac\u201d The Strongest Case AGAINST This Change', and 'Part 3: The Synthesis \u00e2\u20ac\u201d What Both Sides Get Right'. The required five-section structure (steelman of claim, red-team of that steelman, steelman of counter-claim, red-team of counter-claim, synthesis) is not present. There is no distinct steelman of the counter-claim and no red-team of the counter-claim as separate sections. Part 2 is labeled a red team but it argues against the original proposition rather than red-teaming the steelman of the counter-claim."}, {"text": "steelmans-are-genuinely-strong: Both steelman sections represent the strongest reasonable case for their position \u00e2\u20ac\u201d someone who holds that view would recognize it as a fair and compelling presentation, not a weakened version", "passed": false, "evidence": "The response contains only one steelman section (Part 1, for eliminating annual reviews). It is genuinely strong, citing recency bias research, the Adobe case study saving '$80M+ annually', Deloitte/Accenture/GE/Microsoft adoption, and psychological safety research. However, there is no steelman for the counter-claim (keeping structured periodic reviews). Part 2 is framed as a red team, not a steelman. Since 'both steelman sections' cannot exist when only one steelman is present, this assertion fails."}, {"text": "synthesis-gives-actionable-conclusion: The synthesis gives a conclusion that would be genuinely useful to a business leader deciding on performance review policy \u00e2\u20ac\u201d either a clear recommendation, a clear identification of when each approach is better, or a precise naming of the values/empirical question that drives the disagreement", "passed": true, "evidence": "The synthesis states: 'The most defensible position is a hybrid: eliminate annual ratings and forced distributions, but retain semi-annual or annual structured touchpoints that document development, enable cross-calibration, support legal compliance, and integrate with compensation. Layer continuous feedback on top of \u00e2\u20ac\u201d not instead of \u00e2\u20ac\u201d that structural foundation. The proposition as stated (\"replace with continuous feedback only\") overclaims. The word \"only\" is where it breaks down.' This gives a business leader a clear, specific recommendation with enumerated justifications."}], "notes": []}], "run_summary": {"with_skill": {"pass_rate": {"mean": 1.0, "stddev": 0.0, "min": 1.0, "max": 1.0}, "time_seconds": {"mean": 177.5333, "stddev": 13.4001, "min": 162.3, "max": 187.5}, "tokens": {"mean": 18986.0, "stddev": 477.262, "min": 18443, "max": 19339}}, "without_skill": {"pass_rate": {"mean": 0.3433, "stddev": 0.1504, "min": 0.2, "max": 0.5}, "time_seconds": {"mean": 158.2667, "stddev": 8.2857, "min": 152.8, "max": 167.8}, "tokens": {"mean": 16842.6667, "stddev": 457.3952, "min": 16457, "max": 17348}}, "delta": {"pass_rate": "+0.66", "time_seconds": "+19.3", "tokens": "+2143"}}, "notes": []}};
+
+    // ---- State ----
+    let feedbackMap = {};  // run_id -> feedback text
+    let currentIndex = 0;
+    let visitedRuns = new Set();
+
+    // ---- Init ----
+    async function init() {
+      // Load saved feedback from server — but only if this isn't a fresh
+      // iteration (indicated by previous_feedback being present). When
+      // previous feedback exists, the feedback.json on disk is stale from
+      // the prior iteration and should not pre-fill the textareas.
+      const hasPrevious = Object.keys(EMBEDDED_DATA.previous_feedback || {}).length > 0
+        || Object.keys(EMBEDDED_DATA.previous_outputs || {}).length > 0;
+      if (!hasPrevious) {
+        try {
+          const resp = await fetch("/api/feedback");
+          const data = await resp.json();
+          if (data.reviews) {
+            for (const r of data.reviews) feedbackMap[r.run_id] = r.feedback;
+          }
+        } catch { /* first run, no feedback yet */ }
+      }
+
+      document.getElementById("skill-name").textContent = EMBEDDED_DATA.skill_name;
+      showRun(0);
+
+      // Wire up feedback auto-save
+      const textarea = document.getElementById("feedback");
+      let saveTimeout = null;
+      textarea.addEventListener("input", () => {
+        clearTimeout(saveTimeout);
+        document.getElementById("feedback-status").textContent = "";
+        saveTimeout = setTimeout(() => saveCurrentFeedback(), 800);
+      });
+    }
+
+    // ---- Navigation ----
+    function navigate(delta) {
+      const newIndex = currentIndex + delta;
+      if (newIndex >= 0 && newIndex < EMBEDDED_DATA.runs.length) {
+        saveCurrentFeedback();
+        showRun(newIndex);
+      }
+    }
+
+    function updateNavButtons() {
+      document.getElementById("prev-btn").disabled = currentIndex === 0;
+      document.getElementById("next-btn").disabled =
+        currentIndex === EMBEDDED_DATA.runs.length - 1;
+    }
+
+    // ---- Show a run ----
+    function showRun(index) {
+      currentIndex = index;
+      const run = EMBEDDED_DATA.runs[index];
+
+      // Progress
+      document.getElementById("progress").textContent =
+        `${index + 1} of ${EMBEDDED_DATA.runs.length}`;
+
+      // Prompt
+      document.getElementById("prompt-text").textContent = run.prompt;
+
+      // Config badge
+      const badge = document.getElementById("config-badge");
+      const configMatch = run.id.match(/(with_skill|without_skill|new_skill|old_skill)/);
+      if (configMatch) {
+        const config = configMatch[1];
+        const isBaseline = config === "without_skill" || config === "old_skill";
+        badge.textContent = config.replace(/_/g, " ");
+        badge.className = "config-badge " + (isBaseline ? "config-baseline" : "config-primary");
+        badge.style.display = "inline-block";
+      } else {
+        badge.style.display = "none";
+      }
+
+      // Outputs
+      renderOutputs(run);
+
+      // Previous outputs
+      renderPrevOutputs(run);
+
+      // Grades
+      renderGrades(run);
+
+      // Previous feedback
+      const prevFb = (EMBEDDED_DATA.previous_feedback || {})[run.id];
+      const prevEl = document.getElementById("prev-feedback");
+      if (prevFb) {
+        document.getElementById("prev-feedback-text").textContent = prevFb;
+        prevEl.style.display = "block";
+      } else {
+        prevEl.style.display = "none";
+      }
+
+      // Feedback
+      document.getElementById("feedback").value = feedbackMap[run.id] || "";
+      document.getElementById("feedback-status").textContent = "";
+
+      updateNavButtons();
+
+      // Track visited runs and promote done button when all visited
+      visitedRuns.add(index);
+      const doneBtn = document.getElementById("done-btn");
+      if (visitedRuns.size >= EMBEDDED_DATA.runs.length) {
+        doneBtn.classList.add("ready");
+      }
+
+      // Scroll main content to top
+      document.querySelector(".main").scrollTop = 0;
+    }
+
+    // ---- Render outputs ----
+    function renderOutputs(run) {
+      const container = document.getElementById("outputs-body");
+      container.innerHTML = "";
+
+      const outputs = run.outputs || [];
+      if (outputs.length === 0) {
+        container.innerHTML = '<div class="empty-state">No output files</div>';
+        return;
+      }
+
+      for (const file of outputs) {
+        const fileDiv = document.createElement("div");
+        fileDiv.className = "output-file";
+
+        // Always show file header with download link
+        const header = document.createElement("div");
+        header.className = "output-file-header";
+        const nameSpan = document.createElement("span");
+        nameSpan.textContent = file.name;
+        header.appendChild(nameSpan);
+        const dlBtn = document.createElement("a");
+        dlBtn.className = "dl-btn";
+        dlBtn.textContent = "Download";
+        dlBtn.download = file.name;
+        dlBtn.href = getDownloadUri(file);
+        header.appendChild(dlBtn);
+        fileDiv.appendChild(header);
+
+        const content = document.createElement("div");
+        content.className = "output-file-content";
+
+        if (file.type === "text") {
+          const pre = document.createElement("pre");
+          pre.textContent = file.content;
+          content.appendChild(pre);
+        } else if (file.type === "image") {
+          const img = document.createElement("img");
+          img.src = file.data_uri;
+          img.alt = file.name;
+          content.appendChild(img);
+        } else if (file.type === "pdf") {
+          const iframe = document.createElement("iframe");
+          iframe.src = file.data_uri;
+          content.appendChild(iframe);
+        } else if (file.type === "xlsx") {
+          renderXlsx(content, file.data_b64);
+        } else if (file.type === "binary") {
+          const a = document.createElement("a");
+          a.className = "download-link";
+          a.href = file.data_uri;
+          a.download = file.name;
+          a.textContent = "Download " + file.name;
+          content.appendChild(a);
+        } else if (file.type === "error") {
+          const pre = document.createElement("pre");
+          pre.textContent = file.content;
+          pre.style.color = "var(--red)";
+          content.appendChild(pre);
+        }
+
+        fileDiv.appendChild(content);
+        container.appendChild(fileDiv);
+      }
+    }
+
+    // ---- XLSX rendering via SheetJS ----
+    function renderXlsx(container, b64Data) {
+      try {
+        const raw = Uint8Array.from(atob(b64Data), c => c.charCodeAt(0));
+        const wb = XLSX.read(raw, { type: "array" });
+
+        for (let i = 0; i < wb.SheetNames.length; i++) {
+          const sheetName = wb.SheetNames[i];
+          const ws = wb.Sheets[sheetName];
+
+          if (wb.SheetNames.length > 1) {
+            const sheetLabel = document.createElement("div");
+            sheetLabel.style.cssText =
+              "font-weight:600; font-size:0.8rem; color:#b0aea5; margin-top:0.5rem; margin-bottom:0.25rem;";
+            sheetLabel.textContent = "Sheet: " + sheetName;
+            container.appendChild(sheetLabel);
+          }
+
+          const htmlStr = XLSX.utils.sheet_to_html(ws, { editable: false });
+          const wrapper = document.createElement("div");
+          wrapper.innerHTML = htmlStr;
+          container.appendChild(wrapper);
+        }
+      } catch (err) {
+        container.textContent = "Error rendering spreadsheet: " + err.message;
+      }
+    }
+
+    // ---- Grades ----
+    function renderGrades(run) {
+      const section = document.getElementById("grades-section");
+      const content = document.getElementById("grades-content");
+
+      if (!run.grading) {
+        section.style.display = "none";
+        return;
+      }
+
+      const grading = run.grading;
+      section.style.display = "block";
+      // Reset to collapsed
+      content.classList.remove("open");
+      document.getElementById("grades-arrow").classList.remove("open");
+
+      const summary = grading.summary || {};
+      const expectations = grading.expectations || [];
+
+      let html = '<div style="padding: 1rem;">';
+
+      // Summary line
+      const passRate = summary.pass_rate != null
+        ? Math.round(summary.pass_rate * 100) + "%"
+        : "?";
+      const badgeClass = summary.pass_rate >= 0.8 ? "grade-pass" : summary.pass_rate >= 0.5 ? "" : "grade-fail";
+      html += '<div class="grades-summary">';
+      html += '<span class="grade-badge ' + badgeClass + '">' + passRate + '</span>';
+      html += '<span>' + (summary.passed || 0) + ' passed, ' + (summary.failed || 0) + ' failed of ' + (summary.total || 0) + '</span>';
+      html += '</div>';
+
+      // Assertions list
+      html += '<ul class="assertion-list">';
+      for (const exp of expectations) {
+        const statusClass = exp.passed ? "pass" : "fail";
+        const statusIcon = exp.passed ? "\u2713" : "\u2717";
+        html += '<li class="assertion-item">';
+        html += '<span class="assertion-status ' + statusClass + '">' + statusIcon + '</span>';
+        html += '<span>' + escapeHtml(exp.text) + '</span>';
+        if (exp.evidence) {
+          html += '<div class="assertion-evidence">' + escapeHtml(exp.evidence) + '</div>';
+        }
+        html += '</li>';
+      }
+      html += '</ul>';
+
+      html += '</div>';
+      content.innerHTML = html;
+    }
+
+    function toggleGrades() {
+      const content = document.getElementById("grades-content");
+      const arrow = document.getElementById("grades-arrow");
+      content.classList.toggle("open");
+      arrow.classList.toggle("open");
+    }
+
+    // ---- Previous outputs (collapsible) ----
+    function renderPrevOutputs(run) {
+      const section = document.getElementById("prev-outputs-section");
+      const content = document.getElementById("prev-outputs-content");
+      const prevOutputs = (EMBEDDED_DATA.previous_outputs || {})[run.id];
+
+      if (!prevOutputs || prevOutputs.length === 0) {
+        section.style.display = "none";
+        return;
+      }
+
+      section.style.display = "block";
+      // Reset to collapsed
+      content.classList.remove("open");
+      document.getElementById("prev-outputs-arrow").classList.remove("open");
+
+      // Render the files into the content area
+      content.innerHTML = "";
+      const wrapper = document.createElement("div");
+      wrapper.style.padding = "1rem";
+
+      for (const file of prevOutputs) {
+        const fileDiv = document.createElement("div");
+        fileDiv.className = "output-file";
+
+        const header = document.createElement("div");
+        header.className = "output-file-header";
+        const nameSpan = document.createElement("span");
+        nameSpan.textContent = file.name;
+        header.appendChild(nameSpan);
+        const dlBtn = document.createElement("a");
+        dlBtn.className = "dl-btn";
+        dlBtn.textContent = "Download";
+        dlBtn.download = file.name;
+        dlBtn.href = getDownloadUri(file);
+        header.appendChild(dlBtn);
+        fileDiv.appendChild(header);
+
+        const fc = document.createElement("div");
+        fc.className = "output-file-content";
+
+        if (file.type === "text") {
+          const pre = document.createElement("pre");
+          pre.textContent = file.content;
+          fc.appendChild(pre);
+        } else if (file.type === "image") {
+          const img = document.createElement("img");
+          img.src = file.data_uri;
+          img.alt = file.name;
+          fc.appendChild(img);
+        } else if (file.type === "pdf") {
+          const iframe = document.createElement("iframe");
+          iframe.src = file.data_uri;
+          fc.appendChild(iframe);
+        } else if (file.type === "xlsx") {
+          renderXlsx(fc, file.data_b64);
+        } else if (file.type === "binary") {
+          const a = document.createElement("a");
+          a.className = "download-link";
+          a.href = file.data_uri;
+          a.download = file.name;
+          a.textContent = "Download " + file.name;
+          fc.appendChild(a);
+        }
+
+        fileDiv.appendChild(fc);
+        wrapper.appendChild(fileDiv);
+      }
+
+      content.appendChild(wrapper);
+    }
+
+    function togglePrevOutputs() {
+      const content = document.getElementById("prev-outputs-content");
+      const arrow = document.getElementById("prev-outputs-arrow");
+      content.classList.toggle("open");
+      arrow.classList.toggle("open");
+    }
+
+    // ---- Feedback (saved to server -> feedback.json) ----
+    function saveCurrentFeedback() {
+      const run = EMBEDDED_DATA.runs[currentIndex];
+      const text = document.getElementById("feedback").value;
+
+      if (text.trim() === "") {
+        delete feedbackMap[run.id];
+      } else {
+        feedbackMap[run.id] = text;
+      }
+
+      // Build reviews array from map
+      const reviews = [];
+      for (const [run_id, feedback] of Object.entries(feedbackMap)) {
+        if (feedback.trim()) {
+          reviews.push({ run_id, feedback, timestamp: new Date().toISOString() });
+        }
+      }
+
+      fetch("/api/feedback", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ reviews, status: "in_progress" }),
+      }).then(() => {
+        document.getElementById("feedback-status").textContent = "Saved";
+      }).catch(() => {
+        // Static mode or server unavailable — no-op on auto-save,
+        // feedback will be downloaded on final submit
+        document.getElementById("feedback-status").textContent = "Will download on submit";
+      });
+    }
+
+    // ---- Done ----
+    function showDoneDialog() {
+      // Save current textarea to feedbackMap (but don't POST yet)
+      const run = EMBEDDED_DATA.runs[currentIndex];
+      const text = document.getElementById("feedback").value;
+      if (text.trim() === "") {
+        delete feedbackMap[run.id];
+      } else {
+        feedbackMap[run.id] = text;
+      }
+
+      // POST once with status: complete — include ALL runs so the model
+      // can distinguish "no feedback" (looks good) from "not reviewed"
+      const reviews = [];
+      const ts = new Date().toISOString();
+      for (const r of EMBEDDED_DATA.runs) {
+        reviews.push({ run_id: r.id, feedback: feedbackMap[r.id] || "", timestamp: ts });
+      }
+      const payload = JSON.stringify({ reviews, status: "complete" }, null, 2);
+      fetch("/api/feedback", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: payload,
+      }).then(() => {
+        document.getElementById("done-overlay").classList.add("visible");
+      }).catch(() => {
+        // Server not available (static mode) — download as file
+        const blob = new Blob([payload], { type: "application/json" });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = "feedback.json";
+        a.click();
+        URL.revokeObjectURL(url);
+        document.getElementById("done-overlay").classList.add("visible");
+      });
+    }
+
+    function closeDoneDialog() {
+      // Reset status back to in_progress
+      saveCurrentFeedback();
+      document.getElementById("done-overlay").classList.remove("visible");
+    }
+
+    // ---- Toast ----
+    function showToast(message) {
+      const toast = document.getElementById("toast");
+      toast.textContent = message;
+      toast.classList.add("visible");
+      setTimeout(() => toast.classList.remove("visible"), 2000);
+    }
+
+    // ---- Keyboard nav ----
+    document.addEventListener("keydown", (e) => {
+      // Don't capture when typing in textarea
+      if (e.target.tagName === "TEXTAREA") return;
+
+      if (e.key === "ArrowLeft" || e.key === "ArrowUp") {
+        e.preventDefault();
+        navigate(-1);
+      } else if (e.key === "ArrowRight" || e.key === "ArrowDown") {
+        e.preventDefault();
+        navigate(1);
+      }
+    });
+
+    // ---- Util ----
+    function getDownloadUri(file) {
+      if (file.data_uri) return file.data_uri;
+      if (file.data_b64) return "data:application/octet-stream;base64," + file.data_b64;
+      if (file.type === "text") return "data:text/plain;charset=utf-8," + encodeURIComponent(file.content);
+      return "#";
+    }
+
+    function escapeHtml(text) {
+      const div = document.createElement("div");
+      div.textContent = text;
+      return div.innerHTML;
+    }
+
+    // ---- View switching ----
+    function switchView(view) {
+      document.querySelectorAll(".view-tab").forEach(t => t.classList.remove("active"));
+      document.querySelectorAll(".view-panel").forEach(p => p.classList.remove("active"));
+      document.querySelector(`[onclick="switchView('${view}')"]`).classList.add("active");
+      document.getElementById("panel-" + view).classList.add("active");
+    }
+
+    // ---- Benchmark rendering ----
+    function renderBenchmark() {
+      const data = EMBEDDED_DATA.benchmark;
+      if (!data) return;
+
+      // Show the tabs
+      document.getElementById("view-tabs").style.display = "flex";
+
+      const container = document.getElementById("benchmark-content");
+      const summary = data.run_summary || {};
+      const metadata = data.metadata || {};
+      const notes = data.notes || [];
+
+      let html = "";
+
+      // Header
+      html += "<h2 style='font-family: Poppins, sans-serif; margin-bottom: 0.5rem;'>Benchmark Results</h2>";
+      html += "<p style='color: var(--text-muted); font-size: 0.875rem; margin-bottom: 1.25rem;'>";
+      if (metadata.skill_name) html += "<strong>" + escapeHtml(metadata.skill_name) + "</strong> &mdash; ";
+      if (metadata.timestamp) html += metadata.timestamp + " &mdash; ";
+      if (metadata.evals_run) html += "Evals: " + metadata.evals_run.join(", ") + " &mdash; ";
+      html += (metadata.runs_per_configuration || "?") + " runs per configuration";
+      html += "</p>";
+
+      // Summary table
+      html += '<table class="benchmark-table">';
+
+      function fmtStat(stat, pct) {
+        if (!stat) return "—";
+        const suffix = pct ? "%" : "";
+        const m = pct ? (stat.mean * 100).toFixed(0) : stat.mean.toFixed(1);
+        const s = pct ? (stat.stddev * 100).toFixed(0) : stat.stddev.toFixed(1);
+        return m + suffix + " ± " + s + suffix;
+      }
+
+      function deltaClass(val) {
+        if (!val) return "";
+        const n = parseFloat(val);
+        if (n > 0) return "benchmark-delta-positive";
+        if (n < 0) return "benchmark-delta-negative";
+        return "";
+      }
+
+      // Discover config names dynamically (everything except "delta")
+      const configs = Object.keys(summary).filter(k => k !== "delta");
+      const configA = configs[0] || "config_a";
+      const configB = configs[1] || "config_b";
+      const labelA = configA.replace(/_/g, " ").replace(/\b\w/g, c => c.toUpperCase());
+      const labelB = configB.replace(/_/g, " ").replace(/\b\w/g, c => c.toUpperCase());
+      const a = summary[configA] || {};
+      const b = summary[configB] || {};
+      const delta = summary.delta || {};
+
+      html += "<thead><tr><th>Metric</th><th>" + escapeHtml(labelA) + "</th><th>" + escapeHtml(labelB) + "</th><th>Delta</th></tr></thead>";
+      html += "<tbody>";
+
+      html += "<tr><td><strong>Pass Rate</strong></td>";
+      html += "<td>" + fmtStat(a.pass_rate, true) + "</td>";
+      html += "<td>" + fmtStat(b.pass_rate, true) + "</td>";
+      html += '<td class="' + deltaClass(delta.pass_rate) + '">' + (delta.pass_rate || "—") + "</td></tr>";
+
+      // Time (only show row if data exists)
+      if (a.time_seconds || b.time_seconds) {
+        html += "<tr><td><strong>Time (s)</strong></td>";
+        html += "<td>" + fmtStat(a.time_seconds, false) + "</td>";
+        html += "<td>" + fmtStat(b.time_seconds, false) + "</td>";
+        html += '<td class="' + deltaClass(delta.time_seconds) + '">' + (delta.time_seconds ? delta.time_seconds + "s" : "—") + "</td></tr>";
+      }
+
+      // Tokens (only show row if data exists)
+      if (a.tokens || b.tokens) {
+        html += "<tr><td><strong>Tokens</strong></td>";
+        html += "<td>" + fmtStat(a.tokens, false) + "</td>";
+        html += "<td>" + fmtStat(b.tokens, false) + "</td>";
+        html += '<td class="' + deltaClass(delta.tokens) + '">' + (delta.tokens || "—") + "</td></tr>";
+      }
+
+      html += "</tbody></table>";
+
+      // Per-eval breakdown (if runs data available)
+      const runs = data.runs || [];
+      if (runs.length > 0) {
+        const evalIds = [...new Set(runs.map(r => r.eval_id))].sort((a, b) => a - b);
+
+        html += "<h3 style='font-family: Poppins, sans-serif; margin-bottom: 0.75rem;'>Per-Eval Breakdown</h3>";
+
+        const hasTime = runs.some(r => r.result && r.result.time_seconds != null);
+        const hasErrors = runs.some(r => r.result && r.result.errors > 0);
+
+        for (const evalId of evalIds) {
+          const evalRuns = runs.filter(r => r.eval_id === evalId);
+          const evalName = evalRuns[0] && evalRuns[0].eval_name ? evalRuns[0].eval_name : "Eval " + evalId;
+
+          html += "<h4 style='font-family: Poppins, sans-serif; margin: 1rem 0 0.5rem; color: var(--text);'>" + escapeHtml(evalName) + "</h4>";
+          html += '<table class="benchmark-table">';
+          html += "<thead><tr><th>Config</th><th>Run</th><th>Pass Rate</th>";
+          if (hasTime) html += "<th>Time (s)</th>";
+          if (hasErrors) html += "<th>Crashes During Execution</th>";
+          html += "</tr></thead>";
+          html += "<tbody>";
+
+          // Group by config and render with average rows
+          const configGroups = [...new Set(evalRuns.map(r => r.configuration))];
+          for (let ci = 0; ci < configGroups.length; ci++) {
+            const config = configGroups[ci];
+            const configRuns = evalRuns.filter(r => r.configuration === config);
+            if (configRuns.length === 0) continue;
+
+            const rowClass = ci === 0 ? "benchmark-row-with" : "benchmark-row-without";
+            const configLabel = config.replace(/_/g, " ").replace(/\b\w/g, c => c.toUpperCase());
+
+            for (const run of configRuns) {
+              const r = run.result || {};
+              const prClass = r.pass_rate >= 0.8 ? "benchmark-delta-positive" : r.pass_rate < 0.5 ? "benchmark-delta-negative" : "";
+              html += '<tr class="' + rowClass + '">';
+              html += "<td>" + configLabel + "</td>";
+              html += "<td>" + run.run_number + "</td>";
+              html += '<td class="' + prClass + '">' + ((r.pass_rate || 0) * 100).toFixed(0) + "% (" + (r.passed || 0) + "/" + (r.total || 0) + ")</td>";
+              if (hasTime) html += "<td>" + (r.time_seconds != null ? r.time_seconds.toFixed(1) : "—") + "</td>";
+              if (hasErrors) html += "<td>" + (r.errors || 0) + "</td>";
+              html += "</tr>";
+            }
+
+            // Average row
+            const rates = configRuns.map(r => (r.result || {}).pass_rate || 0);
+            const avgRate = rates.reduce((a, b) => a + b, 0) / rates.length;
+            const avgPrClass = avgRate >= 0.8 ? "benchmark-delta-positive" : avgRate < 0.5 ? "benchmark-delta-negative" : "";
+            html += '<tr class="benchmark-row-avg ' + rowClass + '">';
+            html += "<td>" + configLabel + "</td>";
+            html += "<td>Avg</td>";
+            html += '<td class="' + avgPrClass + '">' + (avgRate * 100).toFixed(0) + "%</td>";
+            if (hasTime) {
+              const times = configRuns.map(r => (r.result || {}).time_seconds).filter(t => t != null);
+              html += "<td>" + (times.length ? (times.reduce((a, b) => a + b, 0) / times.length).toFixed(1) : "—") + "</td>";
+            }
+            if (hasErrors) html += "<td></td>";
+            html += "</tr>";
+          }
+          html += "</tbody></table>";
+
+          // Per-assertion detail for this eval
+          const runsWithExpectations = {};
+          for (const config of configGroups) {
+            runsWithExpectations[config] = evalRuns.filter(r => r.configuration === config && r.expectations && r.expectations.length > 0);
+          }
+          const hasAnyExpectations = Object.values(runsWithExpectations).some(runs => runs.length > 0);
+          if (hasAnyExpectations) {
+            // Collect all unique assertion texts across all configs
+            const allAssertions = [];
+            const seen = new Set();
+            for (const config of configGroups) {
+              for (const run of runsWithExpectations[config]) {
+                for (const exp of (run.expectations || [])) {
+                  if (!seen.has(exp.text)) {
+                    seen.add(exp.text);
+                    allAssertions.push(exp.text);
+                  }
+                }
+              }
+            }
+
+            html += '<table class="benchmark-table" style="margin-top: 0.5rem;">';
+            html += "<thead><tr><th>Assertion</th>";
+            for (const config of configGroups) {
+              const label = config.replace(/_/g, " ").replace(/\b\w/g, c => c.toUpperCase());
+              html += "<th>" + escapeHtml(label) + "</th>";
+            }
+            html += "</tr></thead><tbody>";
+
+            for (const assertionText of allAssertions) {
+              html += "<tr><td>" + escapeHtml(assertionText) + "</td>";
+
+              for (const config of configGroups) {
+                html += "<td>";
+                for (const run of runsWithExpectations[config]) {
+                  const exp = (run.expectations || []).find(e => e.text === assertionText);
+                  if (exp) {
+                    const cls = exp.passed ? "benchmark-delta-positive" : "benchmark-delta-negative";
+                    const icon = exp.passed ? "\u2713" : "\u2717";
+                    html += '<span class="' + cls + '" title="Run ' + run.run_number + ': ' + escapeHtml(exp.evidence || "") + '">' + icon + "</span> ";
+                  } else {
+                    html += "— ";
+                  }
+                }
+                html += "</td>";
+              }
+              html += "</tr>";
+            }
+            html += "</tbody></table>";
+          }
+        }
+      }
+
+      // Notes
+      if (notes.length > 0) {
+        html += '<div class="benchmark-notes">';
+        html += "<h3>Analysis Notes</h3>";
+        html += "<ul>";
+        for (const note of notes) {
+          html += "<li>" + escapeHtml(note) + "</li>";
+        }
+        html += "</ul></div>";
+      }
+
+      container.innerHTML = html;
+    }
+
+    // ---- Start ----
+    init();
+    renderBenchmark();
+  </script>
+</body>
+</html>

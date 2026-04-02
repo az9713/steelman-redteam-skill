@@ -1,0 +1,39 @@
+{
+  "expectations": [
+    {
+      "text": "has-four-sections: The response has clearly delineated steelman of the claim, red-team of that steelman, steelman of the counter-claim, red-team of the counter-claim, and synthesis — all five sections present",
+      "passed": false,
+      "evidence": "The response only has three major sections: 'Part 1: The Steelman — The Strongest Case That Social Media Has Harmed Teen Mental Health', 'Part 2: The Red Team — The Strongest Challenges to This Claim', and 'Synthesis: Where Does the Evidence Land?'. There is no separate 'steelman of the counter-claim' section and no 'red-team of the counter-claim' section. The assertion requires five distinct sections but only three are present."
+    },
+    {
+      "text": "counter-claim-is-positive-case: The counter-claim steelman makes a positive, affirmative case for why social media hasn't significantly worsened teen mental health (or why other factors are more responsible) — it's not just 'the original claim is wrong' but a substantive alternative view",
+      "passed": false,
+      "evidence": "There is no dedicated 'steelman of the counter-claim' section. While the red team section contains some affirmative positive content (e.g., Section 4: 'Some Evidence Suggests Social Media Can Be Protective' — 'For LGBTQ+ teenagers... social media provides access to identity-affirming communities, peer support, and models of healthy adult lives'), this is embedded within the red team section as one of nine sub-points challenging the original claim, not presented as a standalone affirmative steelman of a counter-claim."
+    },
+    {
+      "text": "references-research: The analysis references specific researchers, studies, or bodies of evidence relevant to teen mental health and social media (e.g., Haidt, Twenge, or critics like Orben/Przybylski)",
+      "passed": true,
+      "evidence": "The response references multiple specific researchers and studies: Jean Twenge's 'longitudinal research using large national datasets (the Youth Risk Behavior Survey, the Monitoring the Future study)'; 'a landmark 2019 analysis by Andrew Przybylski and Amy Orben (published in Nature Human Behaviour)'; 'Hunt et al. (2018)' experimental study; 'Frances Haugen's disclosure of internal Facebook research'; and 'A 2022 pre-registered study by Orben, Przybylski, and colleagues specifically testing the \"Great Rewiring\" hypothesis'."
+    },
+    {
+      "text": "synthesis-handles-contradiction: If the four arguments point in genuinely contradictory directions, the synthesis explicitly acknowledges the contradiction rather than papering over it",
+      "passed": true,
+      "evidence": "The synthesis explicitly states: 'The honest answer sits in genuine uncertainty. The steelman presents real evidence of real harm — plausible mechanisms, a striking timing correlation, dose-response patterns, gender asymmetry consistent with proposed mechanisms, and damning internal industry evidence. The red team reveals that the effect sizes are contested, the causal direction is uncertain, the heterogeneity of effects is large, and the methodological challenges are severe.' The synthesis concludes with a nuanced, uncertainty-acknowledging position rather than papering over the contradictions."
+    }
+  ],
+  "summary": {
+    "passed": 2,
+    "failed": 2,
+    "total": 4,
+    "pass_rate": 0.5
+  },
+  "claims": [],
+  "eval_feedback": {
+    "suggestions": [
+      "The response should include a dedicated 'steelman of the counter-claim' section that affirmatively argues why social media has NOT significantly worsened teen mental health (e.g., building on Orben/Przybylski's findings as a positive case, not just a methodological critique).",
+      "The response should include a dedicated 'red-team of the counter-claim' section that challenges the counter-claim steelman, completing the full four-argument dialectical structure.",
+      "The current structure collapses the red-team-of-steelman and steelman-of-counter-claim into a single 'Part 2' section, which misses the intended five-part dialectical format."
+    ],
+    "overall": "The response is high quality — it is well-researched, references specific named researchers and studies (Twenge, Przybylski, Orben, Hunt et al.), and its synthesis honestly acknowledges genuine empirical uncertainty. However, it fails the structural requirement: the prompt asked for a five-part dialectical structure (steelman → red team → counter-claim steelman → counter-claim red team → synthesis), but the response only delivers three sections. The missing counter-claim steelman and counter-claim red team sections mean the response does not fully satisfy the 'steelman and red team' format as specified."
+  }
+}

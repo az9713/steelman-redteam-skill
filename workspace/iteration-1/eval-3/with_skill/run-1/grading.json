@@ -1,0 +1,33 @@
+{
+  "expectations": [
+    {
+      "text": "has-four-sections: The response has clearly structured steelman of the claim, red-team of that steelman, steelman of the counter-claim, red-team of the counter-claim, and synthesis — all five sections present",
+      "passed": true,
+      "evidence": "The response contains five clearly headed sections: '## Steelman: Companies should eliminate annual performance reviews and replace them with continuous feedback only', '## Red Team: Against the Steelman', '## Steelman: Annual performance reviews should be retained (possibly reformed, but not eliminated)', '## Red Team: Against the Counter-Claim\u2019s Steelman', and '## Synthesis'. All five are present and clearly delineated."
+    },
+    {
+      "text": "steelmans-are-genuinely-strong: Both steelman sections represent the strongest reasonable case for their position — someone who holds that view would recognize it as a fair and compelling presentation, not a weakened version",
+      "passed": true,
+      "evidence": "The pro-abolition steelman deploys learning-theory arguments ('Feedback loses most of its instructional value when delayed by months'), concrete corporate evidence ('Adobe eliminated annual reviews in 2012 and saw voluntary attrition drop 30%'), and behavioral economics ('recency bias dominates'). The pro-retention steelman makes the equity floor argument ('A mandatory annual process creates a floor — every employee gets at least one structured, documented assessment per year'), the calibration argument ('Companies need to make decisions about who gets promoted, what salary bands are appropriate'), and a career-trajectory synthesis argument ('An employee\u2019s trajectory... is a long-horizon signal that emerges from accumulated data'). Both are substantive, evidence-grounded, and would be recognizable to genuine advocates of each position."
+    },
+    {
+      "text": "synthesis-gives-actionable-conclusion: The synthesis gives a conclusion that would be genuinely useful to a business leader deciding on performance review policy — either a clear recommendation, a clear identification of when each approach is better, or a precise naming of the values/empirical question that drives the disagreement",
+      "passed": true,
+      "evidence": "The synthesis delivers a direct recommendation: 'The actionable verdict: abolish the annual review as the primary feedback mechanism, replace it with continuous feedback, and preserve periodic structured check-ins (quarterly or semi-annually) that serve the calibration, documentation, and long-horizon synthesis functions the annual review was doing. \u201cContinuous feedback only\u201d overstates the case; \u201ccontinuous feedback plus lighter structured touchpoints\u201d is what the evidence actually supports.' It also precisely names the empirical disagreement driving residual uncertainty: 'These are genuinely empirical disagreements about how feedback systems actually operate in organizations, and the answer likely varies by company size, culture, and manager quality.'"
+    }
+  ],
+  "summary": {
+    "passed": 3,
+    "failed": 0,
+    "total": 3,
+    "pass_rate": 1.0
+  },
+  "claims": [],
+  "eval_feedback": {
+    "suggestions": [
+      "The assertion label says 'has-four-sections' but actually requires five sections — consider renaming the assertion to 'has-five-sections' to avoid confusion.",
+      "The red-team sections could be stress-tested more aggressively; the red team of the counter-claim largely concedes the strongest counter-claim arguments (calibration, long-horizon synthesis) are real but separable, which is a measured rather than maximally adversarial critique."
+    ],
+    "overall": "The response fully satisfies all three assertions. Both steelmans are genuinely strong with concrete evidence and named mechanisms. The synthesis is unusually actionable, delivering a specific hybrid recommendation (continuous feedback plus quarterly structured check-ins) and naming the empirical variables that would drive different conclusions in different organizational contexts."
+  }
+}

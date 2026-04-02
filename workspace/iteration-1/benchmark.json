@@ -1,0 +1,293 @@
+{
+  "metadata": {
+    "skill_name": "steelman-redteam",
+    "skill_path": "<path/to/skill>",
+    "executor_model": "<model-name>",
+    "analyzer_model": "<model-name>",
+    "timestamp": "2026-04-02T06:07:02Z",
+    "evals_run": [
+      1,
+      2,
+      3
+    ],
+    "runs_per_configuration": 3
+  },
+  "runs": [
+    {
+      "eval_id": 1,
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 5,
+        "failed": 0,
+        "total": 5,
+        "time_seconds": 187.5,
+        "tokens": 19339,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "has-four-sections: Output has all four argument sections (steelman of claim, red-team of steelman, steelman of counter-claim, red-team of counter-claim's steelman) plus a synthesis section",
+          "passed": true,
+          "evidence": "All five sections are present with clear headings: '## Steelman: Raising the federal minimum wage to $25/hour would be net positive for low-income workers', '## Red Team: Against the Steelman', '## Steelman: A $25 federal minimum wage would be net negative for low-income workers', '## Red Team: Against the Counter-Claim\u2019s Steelman', and '## Synthesis'."
+        },
+        {
+          "text": "steelmans-cite-evidence: Both steelman sections contain specific empirical evidence, economic reasoning, or concrete examples \u2014 not just vague assertions",
+          "passed": true,
+          "evidence": "Steelman 1 cites: 'The federal minimum wage of $7.25/hour has lost roughly 40% of its real value since 1968', 'The Seattle Minimum Wage Study (Dube et al.)', 'California and New York City have implemented wages well above $15 with no observable employment catastrophe', and '33 million workers'. Steelman 2 (counter-claim) cites specific regional examples ('rural Mississippi or West Virginia', 'rural Alabama'), specific worker categories (young, criminal records, limited English), EITC empirical track record, and the fiscal mechanics of transfer programs."
+        },
+        {
+          "text": "red-teams-find-real-weaknesses: Both red-team sections attack the steelmanned version of each argument (not a weaker version), and identify vulnerabilities that a thoughtful proponent would find genuinely challenging",
+          "passed": true,
+          "evidence": "Red Team 1 directly attacks the steelman's core empirical claims: 'The empirical record supporting minimum wage increases is drawn almost entirely from studies of increases to $10, $12, or $15 \u2014 not $25' and 'fast food and retail operate on 2-5% net margins. Where is the monopsony rent?' \u2014 directly undermining the monopsony argument. Red Team 2 attacks the counter-claim's geographic argument ('proves too much \u2014 it proves that there should be no federal minimum wage'), the productivity-floor argument ('treats productivity as a fixed characteristic'), and the EITC alternative ('The EITC can function as a subsidy to low-wage employers')."
+        },
+        {
+          "text": "synthesis-gives-verdict: The synthesis section provides a specific conclusion, verdict, or clearly names the unresolved empirical question or value disagreement at the heart of the debate \u2014 not just 'it depends' without explanation",
+          "passed": true,
+          "evidence": "'The claim as stated \u2014 that a $25 federal minimum wage would be net positive for low-income workers \u2014 is probably false, and the falseness is not close-call. The key failure is the \u201cfederal\u201d framing combined with the $25 number.' The synthesis also names the unresolved empirical question: 'does the labor market evidence from moderate increases ($10\u2013$15) extend to a $25 federal floor?'"
+        },
+        {
+          "text": "synthesis-explains-reasoning-chain: The synthesis explains how the four preceding arguments (what survived, what was damaged, what converged or contradicted) led to its conclusion",
+          "passed": true,
+          "evidence": "The synthesis contains explicit subsections 'What survived red-teaming', 'What converges', 'What genuinely contradicts', and 'The reasoning chain' with four numbered points tracing each section's contribution: '1. The steelman is strong on the mechanism...It weakens significantly on the $25 threshold specifically and on geographic heterogeneity. 2. The red team on the steelman lands hardest on magnitude extrapolation... 3. The counter-claim steelman is strongest on the geographic mismatch... 4. The red team on the counter-claim partially rehabilitates the steelman...But it does not overcome the geographic heterogeneity problem.'"
+        }
+      ],
+      "notes": []
+    },
+    {
+      "eval_id": 2,
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 4,
+        "failed": 0,
+        "total": 4,
+        "time_seconds": 182.8,
+        "tokens": 19176,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "has-four-sections: The response has clearly delineated steelman of the claim, red-team of that steelman, steelman of the counter-claim, red-team of the counter-claim, and synthesis \u00e2\u20ac\u201d all five sections present",
+          "passed": true,
+          "evidence": "The response contains all five clearly labeled sections separated by horizontal rules: '## Steelman: Social media has made teenage mental health significantly worse', '## Red Team: Against the Steelman', '## Steelman: Social media has not made teenage mental health significantly worse', '## Red Team: Against the Counter-Claim's Steelman', and '## Synthesis'."
+        },
+        {
+          "text": "counter-claim-is-positive-case: The counter-claim steelman makes a positive, affirmative case for why social media hasn't significantly worsened teen mental health (or why other factors are more responsible) \u00e2\u20ac\u201d it's not just 'the original claim is wrong' but a substantive alternative view",
+          "passed": true,
+          "evidence": "The counter-claim steelman affirmatively argues: 'The effect sizes, when measured carefully, are small. Orben and Przybylski's 2019 analysis in Nature Human Behaviour...found that social media use explained roughly 0.4% of the variance in adolescent wellbeing.' It also makes positive cases for alternative explanations: 'Academic pressure has intensified...Economic insecurity post-2008 has materially changed what teenagers expect their futures to look like. The erosion of unstructured time, physical activity, and neighborhood independence has proceeded for decades' and highlights benefits: 'For LGBTQ+ teenagers in non-affirming environments, social media provides access to community, identity development resources, and peer connection that would otherwise be unavailable.'"
+        },
+        {
+          "text": "references-research: The analysis references specific researchers, studies, or bodies of evidence relevant to teen mental health and social media (e.g., Haidt, Twenge, or critics like Orben/Przybylski)",
+          "passed": true,
+          "evidence": "The response references: Jean Twenge's 'longitudinal work' and 'Jonathan Haidt and Jean Twenge's co-authored analyses' (steelman section); 'Amy Orben, Andrew Przybylski' who 'conducted pre-registered analyses on the same large datasets Twenge uses' (red team section); 'Orben and Przybylski's 2019 analysis in Nature Human Behaviour' (counter-claim steelman); 'Sonia Livingstone's research on UK adolescents' (counter-claim steelman); and 'The internal documents leaked from Meta in 2021' (steelman section)."
+        },
+        {
+          "text": "synthesis-handles-contradiction: If the four arguments point in genuinely contradictory directions, the synthesis explicitly acknowledges the contradiction rather than papering over it",
+          "passed": true,
+          "evidence": "'What genuinely contradicts? The core dispute is empirical and unresolved: are the small population-average effect sizes evidence that social media's contribution is minor, or are they consistent with large harms concentrated in vulnerable subgroups that get diluted in aggregate analysis? This is a genuine methodological disagreement between careful researchers who have looked at the same data. It cannot be resolved by argument \u00e2\u20ac\u201d it requires better study designs (randomized experiments, longer longitudinal follow-up, richer outcome measurement).'"
+        }
+      ],
+      "notes": []
+    },
+    {
+      "eval_id": 3,
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 3,
+        "failed": 0,
+        "total": 3,
+        "time_seconds": 162.3,
+        "tokens": 18443,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "has-four-sections: The response has clearly structured steelman of the claim, red-team of that steelman, steelman of the counter-claim, red-team of the counter-claim, and synthesis \u00e2\u20ac\u201d all five sections present",
+          "passed": true,
+          "evidence": "The response contains five clearly headed sections: '## Steelman: Companies should eliminate annual performance reviews and replace them with continuous feedback only', '## Red Team: Against the Steelman', '## Steelman: Annual performance reviews should be retained (possibly reformed, but not eliminated)', '## Red Team: Against the Counter-Claim\u2019s Steelman', and '## Synthesis'. All five are present and clearly delineated."
+        },
+        {
+          "text": "steelmans-are-genuinely-strong: Both steelman sections represent the strongest reasonable case for their position \u00e2\u20ac\u201d someone who holds that view would recognize it as a fair and compelling presentation, not a weakened version",
+          "passed": true,
+          "evidence": "The pro-abolition steelman deploys learning-theory arguments ('Feedback loses most of its instructional value when delayed by months'), concrete corporate evidence ('Adobe eliminated annual reviews in 2012 and saw voluntary attrition drop 30%'), and behavioral economics ('recency bias dominates'). The pro-retention steelman makes the equity floor argument ('A mandatory annual process creates a floor \u00e2\u20ac\u201d every employee gets at least one structured, documented assessment per year'), the calibration argument ('Companies need to make decisions about who gets promoted, what salary bands are appropriate'), and a career-trajectory synthesis argument ('An employee\u2019s trajectory... is a long-horizon signal that emerges from accumulated data'). Both are substantive, evidence-grounded, and would be recognizable to genuine advocates of each position."
+        },
+        {
+          "text": "synthesis-gives-actionable-conclusion: The synthesis gives a conclusion that would be genuinely useful to a business leader deciding on performance review policy \u00e2\u20ac\u201d either a clear recommendation, a clear identification of when each approach is better, or a precise naming of the values/empirical question that drives the disagreement",
+          "passed": true,
+          "evidence": "The synthesis delivers a direct recommendation: 'The actionable verdict: abolish the annual review as the primary feedback mechanism, replace it with continuous feedback, and preserve periodic structured check-ins (quarterly or semi-annually) that serve the calibration, documentation, and long-horizon synthesis functions the annual review was doing. \u201cContinuous feedback only\u201d overstates the case; \u201ccontinuous feedback plus lighter structured touchpoints\u201d is what the evidence actually supports.' It also precisely names the empirical disagreement driving residual uncertainty: 'These are genuinely empirical disagreements about how feedback systems actually operate in organizations, and the answer likely varies by company size, culture, and manager quality.'"
+        }
+      ],
+      "notes": []
+    },
+    {
+      "eval_id": 1,
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.2,
+        "passed": 1,
+        "failed": 4,
+        "total": 5,
+        "time_seconds": 154.2,
+        "tokens": 16723,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "has-four-sections: Output has all four argument sections (steelman of claim, red-team of steelman, steelman of counter-claim, red-team of counter-claim's steelman) plus a synthesis section",
+          "passed": false,
+          "evidence": "The output contains only two argument sections \u00e2\u20ac\u201d 'STEELMAN: The Strongest Case FOR' and 'RED TEAM: The Strongest Case AGAINST' \u00e2\u20ac\u201d followed by a 'Summary'. There is no 'steelman of counter-claim' (the strongest case against raising the minimum wage to $25) and no 'red-team of counter-claim's steelman'. The required four-section dialectical structure is absent; the output follows a conventional two-sided debate format instead."
+        },
+        {
+          "text": "steelmans-cite-evidence: Both steelman sections contain specific empirical evidence, economic reasoning, or concrete examples \u00e2\u20ac\u201d not just vague assertions",
+          "passed": false,
+          "evidence": "Only one steelman section exists. That section is evidence-rich \u00e2\u20ac\u201d it cites the CBO 2021 analysis, economists Dube/Reich/Zipperer, Seattle/San Francisco/New York city-level examples, monopsony literature, and SNAP/Medicaid spending estimates. However, because there is no steelman of the counter-claim, the assertion that 'both steelman sections' contain empirical evidence cannot be satisfied. The single steelman section would pass on its own merits."
+        },
+        {
+          "text": "red-teams-find-real-weaknesses: Both red-team sections attack the steelmanned version of each argument (not a weaker version), and identify vulnerabilities that a thoughtful proponent would find genuinely challenging",
+          "passed": false,
+          "evidence": "Only one red-team section exists. That section does engage seriously with the steelmanned arguments \u00e2\u20ac\u201d for example, 'The Empirical Literature Does Not Clearly Generalize to $25' directly challenges the Dube/Reich/Zipperer evidence cited in the steelman, and the automation and regional variation points are genuinely challenging. However, because there is no steelman of counter-claim and therefore no red-team of counter-claim's steelman, the assertion that 'both red-team sections' attack steelmanned arguments cannot be satisfied."
+        },
+        {
+          "text": "synthesis-gives-verdict: The synthesis section provides a specific conclusion, verdict, or clearly names the unresolved empirical question or value disagreement at the heart of the debate \u00e2\u20ac\u201d not just 'it depends' without explanation",
+          "passed": true,
+          "evidence": "The Summary provides a specific, calibrated verdict: 'a $15\u00e2\u20ac\u201c$18 federal minimum with regional adjustment mechanisms has a reasonably strong evidence base behind it. A flat $25 national minimum involves substantially more uncertainty, and the risk that it harms the specific low-income workers it is designed to help is non-trivial rather than dismissible.' This names a concrete threshold and distinguishes evidentially supported from evidentially unsupported policy levels."
+        },
+        {
+          "text": "synthesis-explains-reasoning-chain: The synthesis explains how the four preceding arguments (what survived, what was damaged, what converged or contradicted) led to its conclusion",
+          "passed": false,
+          "evidence": "The Summary references the steelman and red-team cases ('The steelman case is genuinely strong... The red team case is also genuinely strong') but there are only two preceding argument sections, not four. The synthesis cannot trace a reasoning chain through four arguments that do not exist. The summary is a reasonable synthesis of the two-section structure actually present, but it does not \u00e2\u20ac\u201d and cannot \u00e2\u20ac\u201d explain how four arguments converged or contradicted to produce its conclusion."
+        }
+      ],
+      "notes": []
+    },
+    {
+      "eval_id": 2,
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.5,
+        "passed": 2,
+        "failed": 2,
+        "total": 4,
+        "time_seconds": 167.8,
+        "tokens": 17348,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "has-four-sections: The response has clearly delineated steelman of the claim, red-team of that steelman, steelman of the counter-claim, red-team of the counter-claim, and synthesis \u00e2\u20ac\u201d all five sections present",
+          "passed": false,
+          "evidence": "The response only has three major sections: 'Part 1: The Steelman \u00e2\u20ac\u201d The Strongest Case That Social Media Has Harmed Teen Mental Health', 'Part 2: The Red Team \u00e2\u20ac\u201d The Strongest Challenges to This Claim', and 'Synthesis: Where Does the Evidence Land?'. There is no separate 'steelman of the counter-claim' section and no 'red-team of the counter-claim' section. The assertion requires five distinct sections but only three are present."
+        },
+        {
+          "text": "counter-claim-is-positive-case: The counter-claim steelman makes a positive, affirmative case for why social media hasn't significantly worsened teen mental health (or why other factors are more responsible) \u00e2\u20ac\u201d it's not just 'the original claim is wrong' but a substantive alternative view",
+          "passed": false,
+          "evidence": "There is no dedicated 'steelman of the counter-claim' section. While the red team section contains some affirmative positive content (e.g., Section 4: 'Some Evidence Suggests Social Media Can Be Protective' \u00e2\u20ac\u201d 'For LGBTQ+ teenagers... social media provides access to identity-affirming communities, peer support, and models of healthy adult lives'), this is embedded within the red team section as one of nine sub-points challenging the original claim, not presented as a standalone affirmative steelman of a counter-claim."
+        },
+        {
+          "text": "references-research: The analysis references specific researchers, studies, or bodies of evidence relevant to teen mental health and social media (e.g., Haidt, Twenge, or critics like Orben/Przybylski)",
+          "passed": true,
+          "evidence": "The response references multiple specific researchers and studies: Jean Twenge's 'longitudinal research using large national datasets (the Youth Risk Behavior Survey, the Monitoring the Future study)'; 'a landmark 2019 analysis by Andrew Przybylski and Amy Orben (published in Nature Human Behaviour)'; 'Hunt et al. (2018)' experimental study; 'Frances Haugen's disclosure of internal Facebook research'; and 'A 2022 pre-registered study by Orben, Przybylski, and colleagues specifically testing the \"Great Rewiring\" hypothesis'."
+        },
+        {
+          "text": "synthesis-handles-contradiction: If the four arguments point in genuinely contradictory directions, the synthesis explicitly acknowledges the contradiction rather than papering over it",
+          "passed": true,
+          "evidence": "The synthesis explicitly states: 'The honest answer sits in genuine uncertainty. The steelman presents real evidence of real harm \u00e2\u20ac\u201d plausible mechanisms, a striking timing correlation, dose-response patterns, gender asymmetry consistent with proposed mechanisms, and damning internal industry evidence. The red team reveals that the effect sizes are contested, the causal direction is uncertain, the heterogeneity of effects is large, and the methodological challenges are severe.' The synthesis concludes with a nuanced, uncertainty-acknowledging position rather than papering over the contradictions."
+        }
+      ],
+      "notes": []
+    },
+    {
+      "eval_id": 3,
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.33,
+        "passed": 1,
+        "failed": 2,
+        "total": 3,
+        "time_seconds": 152.8,
+        "tokens": 16457,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "has-four-sections: The response has clearly structured steelman of the claim, red-team of that steelman, steelman of the counter-claim, red-team of the counter-claim, and synthesis \u00e2\u20ac\u201d all five sections present",
+          "passed": false,
+          "evidence": "The response has only three sections: 'Part 1: The Steelman \u00e2\u20ac\u201d The Best Case FOR This Change', 'Part 2: The Red Team \u00e2\u20ac\u201d The Strongest Case AGAINST This Change', and 'Part 3: The Synthesis \u00e2\u20ac\u201d What Both Sides Get Right'. The required five-section structure (steelman of claim, red-team of that steelman, steelman of counter-claim, red-team of counter-claim, synthesis) is not present. There is no distinct steelman of the counter-claim and no red-team of the counter-claim as separate sections. Part 2 is labeled a red team but it argues against the original proposition rather than red-teaming the steelman of the counter-claim."
+        },
+        {
+          "text": "steelmans-are-genuinely-strong: Both steelman sections represent the strongest reasonable case for their position \u00e2\u20ac\u201d someone who holds that view would recognize it as a fair and compelling presentation, not a weakened version",
+          "passed": false,
+          "evidence": "The response contains only one steelman section (Part 1, for eliminating annual reviews). It is genuinely strong, citing recency bias research, the Adobe case study saving '$80M+ annually', Deloitte/Accenture/GE/Microsoft adoption, and psychological safety research. However, there is no steelman for the counter-claim (keeping structured periodic reviews). Part 2 is framed as a red team, not a steelman. Since 'both steelman sections' cannot exist when only one steelman is present, this assertion fails."
+        },
+        {
+          "text": "synthesis-gives-actionable-conclusion: The synthesis gives a conclusion that would be genuinely useful to a business leader deciding on performance review policy \u00e2\u20ac\u201d either a clear recommendation, a clear identification of when each approach is better, or a precise naming of the values/empirical question that drives the disagreement",
+          "passed": true,
+          "evidence": "The synthesis states: 'The most defensible position is a hybrid: eliminate annual ratings and forced distributions, but retain semi-annual or annual structured touchpoints that document development, enable cross-calibration, support legal compliance, and integrate with compensation. Layer continuous feedback on top of \u00e2\u20ac\u201d not instead of \u00e2\u20ac\u201d that structural foundation. The proposition as stated (\"replace with continuous feedback only\") overclaims. The word \"only\" is where it breaks down.' This gives a business leader a clear, specific recommendation with enumerated justifications."
+        }
+      ],
+      "notes": []
+    }
+  ],
+  "run_summary": {
+    "with_skill": {
+      "pass_rate": {
+        "mean": 1.0,
+        "stddev": 0.0,
+        "min": 1.0,
+        "max": 1.0
+      },
+      "time_seconds": {
+        "mean": 177.5333,
+        "stddev": 13.4001,
+        "min": 162.3,
+        "max": 187.5
+      },
+      "tokens": {
+        "mean": 18986.0,
+        "stddev": 477.262,
+        "min": 18443,
+        "max": 19339
+      }
+    },
+    "without_skill": {
+      "pass_rate": {
+        "mean": 0.3433,
+        "stddev": 0.1504,
+        "min": 0.2,
+        "max": 0.5
+      },
+      "time_seconds": {
+        "mean": 158.2667,
+        "stddev": 8.2857,
+        "min": 152.8,
+        "max": 167.8
+      },
+      "tokens": {
+        "mean": 16842.6667,
+        "stddev": 457.3952,
+        "min": 16457,
+        "max": 17348
+      }
+    },
+    "delta": {
+      "pass_rate": "+0.66",
+      "time_seconds": "+19.3",
+      "tokens": "+2143"
+    }
+  },
+  "notes": []
+}

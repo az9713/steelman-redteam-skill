@@ -1,0 +1,39 @@
+{
+  "expectations": [
+    {
+      "text": "has-four-sections: The response has clearly delineated steelman of the claim, red-team of that steelman, steelman of the counter-claim, red-team of the counter-claim, and synthesis — all five sections present",
+      "passed": true,
+      "evidence": "The response contains all five clearly labeled sections separated by horizontal rules: '## Steelman: Social media has made teenage mental health significantly worse', '## Red Team: Against the Steelman', '## Steelman: Social media has not made teenage mental health significantly worse', '## Red Team: Against the Counter-Claim's Steelman', and '## Synthesis'."
+    },
+    {
+      "text": "counter-claim-is-positive-case: The counter-claim steelman makes a positive, affirmative case for why social media hasn't significantly worsened teen mental health (or why other factors are more responsible) — it's not just 'the original claim is wrong' but a substantive alternative view",
+      "passed": true,
+      "evidence": "The counter-claim steelman affirmatively argues: 'The effect sizes, when measured carefully, are small. Orben and Przybylski's 2019 analysis in Nature Human Behaviour...found that social media use explained roughly 0.4% of the variance in adolescent wellbeing.' It also makes positive cases for alternative explanations: 'Academic pressure has intensified...Economic insecurity post-2008 has materially changed what teenagers expect their futures to look like. The erosion of unstructured time, physical activity, and neighborhood independence has proceeded for decades' and highlights benefits: 'For LGBTQ+ teenagers in non-affirming environments, social media provides access to community, identity development resources, and peer connection that would otherwise be unavailable.'"
+    },
+    {
+      "text": "references-research: The analysis references specific researchers, studies, or bodies of evidence relevant to teen mental health and social media (e.g., Haidt, Twenge, or critics like Orben/Przybylski)",
+      "passed": true,
+      "evidence": "The response references: Jean Twenge's 'longitudinal work' and 'Jonathan Haidt and Jean Twenge's co-authored analyses' (steelman section); 'Amy Orben, Andrew Przybylski' who 'conducted pre-registered analyses on the same large datasets Twenge uses' (red team section); 'Orben and Przybylski's 2019 analysis in Nature Human Behaviour' (counter-claim steelman); 'Sonia Livingstone's research on UK adolescents' (counter-claim steelman); and 'The internal documents leaked from Meta in 2021' (steelman section)."
+    },
+    {
+      "text": "synthesis-handles-contradiction: If the four arguments point in genuinely contradictory directions, the synthesis explicitly acknowledges the contradiction rather than papering over it",
+      "passed": true,
+      "evidence": "'What genuinely contradicts? The core dispute is empirical and unresolved: are the small population-average effect sizes evidence that social media's contribution is minor, or are they consistent with large harms concentrated in vulnerable subgroups that get diluted in aggregate analysis? This is a genuine methodological disagreement between careful researchers who have looked at the same data. It cannot be resolved by argument — it requires better study designs (randomized experiments, longer longitudinal follow-up, richer outcome measurement).'"
+    }
+  ],
+  "summary": {
+    "passed": 4,
+    "failed": 0,
+    "total": 4,
+    "pass_rate": 1.0
+  },
+  "claims": [],
+  "eval_feedback": {
+    "suggestions": [
+      "The assertion label 'has-four-sections' is misleading — it actually requires five sections. Consider renaming to 'has-five-sections' for clarity.",
+      "Future assertions could test for depth or balance within each section, not just presence.",
+      "Consider adding an assertion that checks the red-team sections are genuinely adversarial rather than strawmen."
+    ],
+    "overall": "The response fully satisfies all four assertions. It has all five required sections clearly labeled and separated, the counter-claim steelman is substantive and affirmative (citing specific research and alternative causal factors), specific researchers and studies are named throughout (Twenge, Haidt, Orben, Przybylski, Livingstone, Meta internal documents, Nature Human Behaviour 2019), and the synthesis explicitly names and preserves the core empirical contradiction rather than resolving it artificially. This is a high-quality steelman/red-team output."
+  }
+}

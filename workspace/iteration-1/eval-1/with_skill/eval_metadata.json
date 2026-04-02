@@ -1,0 +1,6 @@
+{
+  "eval_id": 1,
+  "eval_name": "minimum-wage-25-dollar",
+  "prompt": "steelman and red team this for me: raising the minimum wage to $25/hour in the US would be net positive for low-income workers",
+  "assertions": []
+}
