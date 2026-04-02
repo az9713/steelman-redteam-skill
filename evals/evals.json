@@ -1,0 +1,101 @@
+{
+  "skill_name": "steelman-redteam",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "steelman and red team this for me: raising the minimum wage to $25/hour in the US would be net positive for low-income workers",
+      "expected_output": "Four-section analysis: steelman of the claim (best case for $25 minimum wage helping low-income workers), red-team of that steelman (strongest attacks on it), steelman of the counter-claim (best case that it would hurt low-income workers), red-team of the counter-claim's steelman, then a synthesis identifying the strongest signals and giving a verdict or naming the key unresolved crux.",
+      "assertions": [
+        {
+          "name": "has-four-sections",
+          "description": "Output contains all four argument sections plus synthesis",
+          "type": "string_match",
+          "pattern": "(?i)(steelman.*minimum|red.team.*steelman|counter.claim|synthesis)"
+        },
+        {
+          "name": "steelmans-cite-evidence",
+          "description": "The steelmans reference specific evidence, studies, or reasoning (not just vague assertions)",
+          "type": "llm_judge",
+          "criterion": "Both steelman sections contain specific empirical evidence, economic reasoning, or concrete examples — not just vague assertions"
+        },
+        {
+          "name": "red-teams-find-real-weaknesses",
+          "description": "Red-teams identify genuine vulnerabilities, not strawmen",
+          "type": "llm_judge",
+          "criterion": "Both red-team sections attack the *steelmanned* version of each argument (not a weaker version), and identify vulnerabilities that a thoughtful proponent would find genuinely challenging"
+        },
+        {
+          "name": "synthesis-gives-verdict",
+          "description": "Synthesis arrives at a conclusion or clearly names the crux",
+          "type": "llm_judge",
+          "criterion": "The synthesis section provides a specific conclusion, verdict, or clearly names the unresolved empirical question or value disagreement at the heart of the debate — not just 'it depends' without explanation"
+        },
+        {
+          "name": "synthesis-explains-reasoning-chain",
+          "description": "Synthesis traces how the four arguments led to the conclusion",
+          "type": "llm_judge",
+          "criterion": "The synthesis explains how the four preceding arguments (what survived, what was damaged, what converged or contradicted) led to its conclusion"
+        }
+      ],
+      "files": []
+    },
+    {
+      "id": 2,
+      "prompt": "Can you steelman and red team the idea that social media has made teenage mental health significantly worse?",
+      "expected_output": "Four-section analysis covering the claim (social media worsening teen mental health), its red-team, the counter-claim (social media hasn't significantly worsened teen mental health, or other factors explain it), its red-team, and synthesis.",
+      "assertions": [
+        {
+          "name": "has-four-sections",
+          "description": "Output contains all four argument sections plus synthesis",
+          "type": "llm_judge",
+          "criterion": "The response has clearly delineated steelman of the claim, red-team of that steelman, steelman of the counter-claim, red-team of the counter-claim, and synthesis"
+        },
+        {
+          "name": "counter-claim-is-positive-case",
+          "description": "Counter-claim steelman is a positive argument, not just negation",
+          "type": "llm_judge",
+          "criterion": "The counter-claim steelman makes a positive, affirmative case for why social media hasn't significantly worsened teen mental health (or why other factors are more responsible) — it's not just 'the original claim is wrong' but a substantive alternative view"
+        },
+        {
+          "name": "references-research",
+          "description": "Analysis engages with actual research on the topic",
+          "type": "llm_judge",
+          "criterion": "The analysis references specific researchers, studies, or bodies of evidence relevant to teen mental health and social media (e.g., Haidt, Twenge, or critics like Orben/Przybylski)"
+        },
+        {
+          "name": "synthesis-handles-contradiction",
+          "description": "If signals are contradictory, synthesis says so explicitly",
+          "type": "llm_judge",
+          "criterion": "If the four arguments point in genuinely contradictory directions, the synthesis explicitly acknowledges the contradiction rather than papering over it"
+        }
+      ],
+      "files": []
+    },
+    {
+      "id": 3,
+      "prompt": "I want you to steelman and red team this: companies should eliminate annual performance reviews and replace them with continuous feedback only",
+      "expected_output": "Four-section analysis of the HR/management proposal: steelman (best case for eliminating annual reviews), red-team of that, steelman of keeping annual reviews (or the counter-position), red-team of that, synthesis with verdict.",
+      "assertions": [
+        {
+          "name": "has-four-sections",
+          "description": "Output contains all four argument sections plus synthesis",
+          "type": "llm_judge",
+          "criterion": "The response has clearly structured steelman of the claim, red-team of that steelman, steelman of the counter-claim, red-team of the counter-claim, and synthesis — all five sections present"
+        },
+        {
+          "name": "steelmans-are-genuinely-strong",
+          "description": "Each steelman is the strongest reasonable version of its position",
+          "type": "llm_judge",
+          "criterion": "Both steelman sections represent the strongest reasonable case for their position — someone who holds that view would recognize it as a fair and compelling presentation, not a weakened version"
+        },
+        {
+          "name": "synthesis-gives-actionable-conclusion",
+          "description": "Synthesis gives a conclusion useful to a manager or executive making this decision",
+          "type": "llm_judge",
+          "criterion": "The synthesis gives a conclusion that would be genuinely useful to a business leader deciding on performance review policy — either a clear recommendation, a clear identification of when each approach is better, or a precise naming of the values/empirical question that drives the disagreement"
+        }
+      ],
+      "files": []
+    }
+  ]
+}
